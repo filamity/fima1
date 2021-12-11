@@ -1,0 +1,16 @@
+.indexgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  grid-auto-flow: dense;
+}
+@media screen and (max-width: 900px) {
+  .indexgrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 600px) {
+  .indexgrid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}

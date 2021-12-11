@@ -1,0 +1,16 @@
+.announcements {
+  background: var(--blue-3);
+  padding: 15px 20px;
+  grid-column: span 2;
+}
+
+@media screen and (max-width: 900px) {
+  .announcements {
+    grid-column: 1 / -1;
+  }
+}
+@media screen and (max-width: 600px) {
+  .announcements {
+    grid-column: 1 / -1;
+  }
+}

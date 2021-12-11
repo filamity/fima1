@@ -1,0 +1,16 @@
+.tasks {
+  background: var(--blue-3);
+  padding: 15px 20px;
+  grid-column: span 2;
+}
+
+@media screen and (max-width: 900px) {
+  .tasks {
+    grid-column: span 1;
+  }
+}
+@media screen and (max-width: 600px) {
+  .tasks {
+    grid-column: span 1;
+  }
+}

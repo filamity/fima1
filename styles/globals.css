@@ -1,16 +1,69 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@font-face {
+  font-family: "Inter";
+  src: url("/static/fonts/Inter.ttf");
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+:root {
+  --blue-1: #2c387e;
+  --blue-2: #3f51b5;
+  --blue-3: #939ed5;
+}
+
+html, body {
+  padding: 0;
+  margin: 0;
 }
 
 * {
+  font-family: "Inter", Helvetica, sans-serif;
   box-sizing: border-box;
+}
+
+.shadow {
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.buffer-10 {
+  height: 10px;
+}
+.buffer-15 {
+  height: 15px;
+}
+.buffer-20 {
+  height: 20px;
+}
+.buffer-30 {
+  height: 30px;
+}
+.buffer-40 {
+  height: 40px;
+}
+.buffer-50 {
+  height: 50px;
+}
+.inlinebuffer-5 {
+  margin-left: 5px;
+}
+.inlinebuffer-10 {
+  margin-left: 10px;
+}
+.inlinebuffer-15 {
+  margin-left: 15px;
+}
+.inlinebuffer-20 {
+  margin-left: 20px;
+}
+.inlinebuffer-25 {
+  margin-left: 25px;
+}
+
+.container {
+  padding: 3%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.subtitle {
+  font-size: 1.5rem;
+  font-weight: bold;
 }

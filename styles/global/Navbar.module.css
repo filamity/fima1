@@ -1,0 +1,15 @@
+.navwrap {
+  display: flex;
+}
+
+.accountbutton {
+  margin-left: auto;
+}
+
+.drawerheading {
+  padding: 10px;
+  display: flex;
+}
+.drawerheading > div {
+  margin-left: auto;
+}
