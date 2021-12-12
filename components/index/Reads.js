@@ -1,65 +1,180 @@
-import { List, ListItem, ListItemText, Typography } from "@mui/material";
+import {
+  Button,
+  ButtonGroup,
+  Card,
+  Checkbox,
+  FormGroup,
+  Link,
+  List,
+  ListItem,
+  ListItemText,
+  Modal,
+  TextField,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import styles from "../../styles/index/Reads.module.css";
 import Box from "../global/Box";
+import axios from "axios";
+import { Add, Delete, DoDisturb } from "@mui/icons-material";
 
-const Reads = () => {
+const Reads = ({ reads }) => {
+  const { currentUser } = useAuth();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [selecting, setSelecting] = useState(false);
+  const [selected, setSelected] = useState([]);
+  const [read, setRead] = useState({
+    title: "",
+    description: "",
+    link: "",
+  });
+
+  useEffect(() => {
+    setError("");
+  }, [read]);
+
+  const createRead = (e) => {
+    e.preventDefault();
+    let formattedLink = read.link;
+    if (!/^https?:\/\//i.test(formattedLink)) {
+      formattedLink = `http://${formattedLink}`;
+    }
+    axios
+      .post("/api/reads", {
+        title: read.title,
+        description: read.description,
+        link: formattedLink,
+      })
+      .then((res) => {
+        setModalOpen(false);
+        setRead({
+          title: "",
+          description: "",
+          link: "",
+        });
+        window.location.reload();
+      })
+      .catch((err) => {
+        setError(err.message);
+      });
+  };
+
+  const deleteReads = () => {
+    selected.forEach((read) => {
+      axios.delete(`/api/reads/${read}`);
+    });
+    setSelected([]);
+    setSelecting(false);
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setRead((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <Box title="Reads" className={styles.reads}>
+      {(currentUser.role === "admin" || currentUser.role === "teacher") && (
+        <>
+          <ButtonGroup color="primary" variant="contained">
+            <Button onClick={() => setModalOpen(true)}>
+              <Add />
+            </Button>
+            <Button
+              onClick={() => setSelecting((prev) => !prev)}
+              color="primary"
+            >
+              {selecting ? <DoDisturb /> : <Delete />}
+            </Button>
+            {selected.length && selecting ? (
+              <Button onClick={deleteReads} color="error">
+                <Delete />
+              </Button>
+            ) : null}
+          </ButtonGroup>
+          <section className="buffer-10"></section>
+        </>
+      )}
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
+        <Card className={styles.card}>
+          <div className="title">New Read</div>
+          <section className="buffer-20"></section>
+          <form onSubmit={createRead}>
+            <FormGroup>
+              <TextField
+                name="title"
+                onChange={handleChange}
+                label="Title"
+                variant="standard"
+                required
+              />
+              <section className="buffer-20"></section>
+              <TextField
+                name="link"
+                onChange={handleChange}
+                label="Link"
+                variant="standard"
+                required
+              />
+              <section className="buffer-20"></section>
+              <TextField
+                name="description"
+                onChange={handleChange}
+                label="Description"
+                multiline
+                rows={5}
+                required
+              />
+              {error ? (
+                <p className="error">{error}</p>
+              ) : (
+                <section className="buffer-20"></section>
+              )}
+              <Button variant="contained" color="primary" type="submit">
+                Create
+              </Button>
+            </FormGroup>
+          </form>
+        </Card>
+      </Modal>
+
       <List sx={{ bgcolor: "background.paper" }}>
-        <ListItem alignItems="flex-start">
-          <ListItemText
-            primary="Oui Oui"
-            secondary={
-              <>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                >
-                  Sandra Adams
-                </Typography>
-                {" — Do you have Paris recommendations? Have you ever…"}
-              </>
-            }
-          />
-        </ListItem>
-        <ListItem alignItems="flex-start">
-          <ListItemText
-            primary="Oui Oui"
-            secondary={
-              <>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                >
-                  Sandra Adams
-                </Typography>
-                {" — Do you have Paris recommendations? Have you ever…"}
-              </>
-            }
-          />
-        </ListItem>
-        <ListItem alignItems="flex-start">
-          <ListItemText
-            primary="Oui Oui"
-            secondary={
-              <>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component="span"
-                  variant="body2"
-                  color="text.primary"
-                >
-                  Sandra Adams
-                </Typography>
-                {" — Do you have Paris recommendations? Have you ever…"}
-              </>
-            }
-          />
-        </ListItem>
+        {!reads.length && (
+          <ListItem alignItems="flex-start">
+            <ListItemText primary="No Reads" />
+          </ListItem>
+        )}
+        {reads.length
+          ? reads.map((read) => (
+              <ListItem
+                key={read._id}
+                alignItems="flex-start"
+                secondaryAction={
+                  selecting ? (
+                    <Checkbox
+                      edge="end"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelected((prev) => [...prev, read._id]);
+                        } else {
+                          setSelected((prev) =>
+                            prev.filter((id) => id !== read._id)
+                          );
+                        }
+                      }}
+                      checked={selected.includes(read._id)}
+                    />
+                  ) : null
+                }
+              >
+                <ListItemText
+                  primary={<Link href={read.link}>{read.title}</Link>}
+                  secondary={read.description}
+                />
+              </ListItem>
+            ))
+          : null}
       </List>
     </Box>
   );

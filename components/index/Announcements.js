@@ -1,33 +1,71 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../../styles/index/Announcements.module.css";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Box from "../global/Box";
-import { Button, Card, FormGroup, Modal, TextField } from "@mui/material";
+import {
+  Button,
+  Card,
+  Checkbox,
+  FormGroup,
+  Modal,
+  TextField,
+  ButtonGroup,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 import axios from "axios";
+import {
+  Add,
+  Remove,
+  Delete,
+  ExpandMore,
+  DoDisturb,
+} from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 
 const Announcements = ({ announcements }) => {
   const { currentUser } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [selecting, setSelecting] = useState(false);
+  const [selected, setSelected] = useState([]);
+  const [error, setError] = useState("");
   const [announcement, setAnnouncement] = useState({
     title: "",
     description: "",
   });
 
+  useEffect(() => {
+    setError("");
+  }, [announcement]);
+
   const createAnnouncement = (e) => {
     e.preventDefault();
-    axios.post("/api/announcements", announcement).then((res) => {
-      setModalOpen(false);
-      setAnnouncement({
-        title: "",
-        description: "",
+    axios
+      .post("/api/announcements", announcement)
+      .then((res) => {
+        setModalOpen(false);
+        setAnnouncement({
+          title: "",
+          description: "",
+        });
+        window.location.reload();
+      })
+      .catch((err) => {
+        setError(err.message);
       });
+  };
+
+  const deleteAnnouncements = () => {
+    selected.forEach((announcement) => {
+      axios.delete(`/api/announcements/${announcement}`);
     });
+    setSelected([]);
+    setSelecting(false);
   };
 
   const handleAccordion = (panel) => (event, isExpanded) => {
@@ -42,14 +80,29 @@ const Announcements = ({ announcements }) => {
   return (
     <Box title="Announcements" className={styles.announcements}>
       {(currentUser.role === "admin" || currentUser.role === "teacher") && (
-        <Button onClick={() => setModalOpen(true)} variant="contained">
-          New Announcement
-        </Button>
+        <>
+          <ButtonGroup color="primary" variant="contained">
+            <Button onClick={() => setModalOpen(true)}>
+              <Add />
+            </Button>
+            <Button
+              onClick={() => setSelecting((prev) => !prev)}
+              color="primary"
+            >
+              {selecting ? <DoDisturb /> : <Delete />}
+            </Button>
+            {selected.length && selecting ? (
+              <Button onClick={deleteAnnouncements} color="error">
+                <Delete />
+              </Button>
+            ) : null}
+          </ButtonGroup>
+          <section className="buffer-10"></section>
+        </>
       )}
-      <section className="buffer-10"></section>
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Card className={styles.card}>
-          <div className="title">New Task</div>
+          <div className="title">New Announcement</div>
           <section className="buffer-20"></section>
           <form onSubmit={createAnnouncement}>
             <FormGroup>
@@ -58,6 +111,7 @@ const Announcements = ({ announcements }) => {
                 onChange={handleChange}
                 label="Title"
                 variant="standard"
+                required
               />
               <section className="buffer-20"></section>
               <TextField
@@ -66,8 +120,13 @@ const Announcements = ({ announcements }) => {
                 label="Description"
                 multiline
                 rows={5}
+                required
               />
-              <section className="buffer-20"></section>
+              {error ? (
+                <p className="error">{error}</p>
+              ) : (
+                <section className="buffer-20"></section>
+              )}
               <Button variant="contained" color="primary" type="submit">
                 Create
               </Button>
@@ -76,21 +135,46 @@ const Announcements = ({ announcements }) => {
         </Card>
       </Modal>
 
-      {announcements &&
-        announcements.map((announcement) => (
-          <Accordion
-            key={announcement._id}
-            expanded={expanded === announcement._id}
-            onChange={handleAccordion(announcement._id)}
-          >
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography>{announcement.title}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>{announcement.description}</Typography>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+      {!announcements.length && (
+        <List sx={{ bgcolor: "background.paper" }}>
+          <ListItem>
+            <ListItemText primary="No Announcements" />
+          </ListItem>
+        </List>
+      )}
+
+      {announcements.length
+        ? announcements.map((announcement) => (
+            <Accordion
+              key={announcement._id}
+              expanded={expanded === announcement._id}
+              onChange={handleAccordion(announcement._id)}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Typography>{announcement.title}</Typography>
+                {selecting ? (
+                  <Checkbox
+                    edge="end"
+                    className={styles.checkbox}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelected((prev) => [...prev, announcement._id]);
+                      } else {
+                        setSelected((prev) =>
+                          prev.filter((id) => id !== announcement._id)
+                        );
+                      }
+                    }}
+                    checked={selected.includes(announcement._id)}
+                  />
+                ) : null}
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography>{announcement.description}</Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))
+        : null}
     </Box>
   );
 };

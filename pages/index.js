@@ -19,6 +19,9 @@ const Home = () => {
       axios.get("/api/announcements").then(({ data: { data } }) => {
         setAnnouncements(data);
       });
+      axios.get("/api/reads").then(({ data: { data } }) => {
+        setReads(data);
+      });
       axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
         setTasks(data);
       });
@@ -29,11 +32,13 @@ const Home = () => {
     <div className="container">
       {currentUser && (
         <>
-          <h1>Welcome, {currentUser.firstName} {currentUser.lastName}!</h1>
+          <h1>
+            Welcome, {currentUser.firstName} {currentUser.lastName}!
+          </h1>
           <div className={styles.indexgrid}>
             <Announcements announcements={announcements} />
             <Tasks tasks={tasks} />
-            <Reads />
+            <Reads reads={reads} />
             <Tools />
           </div>
         </>
@@ -47,19 +52,5 @@ const Home = () => {
     </div>
   );
 };
-
-// Home.getInitialProps = async () => {
-//   const resNotes = await fetch("http://localhost:3000/api/notes");
-//   const resAnnouncements = await fetch(
-//     "http://localhost:3000/api/announcements"
-//   );
-//   const resTasks = await fetch("http://localhost:3000/api/tasks");
-
-//   const notes = await resNotes.json();
-//   const announcements = await resAnnouncements.json();
-//   const tasks = await resTasks.json();
-
-//   return { notes, announcements, tasks };
-// };
 
 export default Home;

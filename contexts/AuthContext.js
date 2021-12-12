@@ -27,7 +27,7 @@ const AuthProvider = ({ children }) => {
 
       return userData;
     } catch (error) {
-      return null;
+      return error;
     }
   };
 
@@ -58,7 +58,7 @@ const AuthProvider = ({ children }) => {
 
       return userData;
     } catch (error) {
-      return null;
+      return error;
     }
   }
 

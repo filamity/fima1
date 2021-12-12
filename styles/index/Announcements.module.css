@@ -24,3 +24,10 @@
   padding: 20px;
   text-align: center;
 }
+
+.checkbox {
+  position: absolute;
+  right: 50px;
+  top: 3px;
+
+}

@@ -15,10 +15,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import styles from "../../styles/index/Tasks.module.css";
 import Box from "../global/Box";
 import axios from "axios";
+import { Add } from "@mui/icons-material";
 
 const Tasks = ({ tasks }) => {
   const { currentUser } = useAuth();
   const [checked, setChecked] = useState(tasks);
+  const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [task, setTask] = useState({
     title: "",
@@ -30,6 +32,10 @@ const Tasks = ({ tasks }) => {
     setChecked(tasks);
   }, [tasks]);
 
+  useEffect(() => {
+    setError("");
+  }, [task]);
+
   const updateTask = (taskId, completed) => {
     axios
       .put(`/api/tasks/${taskId}`, {
@@ -37,6 +43,9 @@ const Tasks = ({ tasks }) => {
       })
       .then((res) => {
         // console.log(res.data);
+      })
+      .catch((err) => {
+        setError(err.message);
       });
   };
 
@@ -55,6 +64,10 @@ const Tasks = ({ tasks }) => {
           description: "",
           dueAt: "",
         });
+        window.location.reload();
+      })
+      .catch((err) => {
+        setError(err.message);
       });
   };
 
@@ -66,8 +79,10 @@ const Tasks = ({ tasks }) => {
   return (
     <Box title="Tasks" className={styles.tasks}>
       <Button onClick={() => setModalOpen(true)} variant="contained">
-        New Task
+        <Add />
       </Button>
+
+      <section className="buffer-10"></section>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Card className={styles.card}>
@@ -80,6 +95,7 @@ const Tasks = ({ tasks }) => {
                 onChange={handleChange}
                 label="Title"
                 variant="standard"
+                // required
               />
               <section className="buffer-20"></section>
               <TextField
@@ -88,6 +104,7 @@ const Tasks = ({ tasks }) => {
                 label="Description"
                 multiline
                 rows={5}
+                required
               />
               <section className="buffer-20"></section>
               <TextField
@@ -96,8 +113,13 @@ const Tasks = ({ tasks }) => {
                 label="Due At"
                 type="date"
                 InputLabelProps={{ shrink: true }}
+                required
               />
-              <section className="buffer-20"></section>
+              {error ? (
+                <p className="error">{error}</p>
+              ) : (
+                <section className="buffer-20"></section>
+              )}
               <Button variant="contained" color="primary" type="submit">
                 Create
               </Button>
@@ -106,44 +128,48 @@ const Tasks = ({ tasks }) => {
         </Card>
       </Modal>
 
-      <List>
-        {!checked.length && (
-          <ListItem sx={{ bgcolor: "background.paper" }}>
+      {!checked.length && (
+        <List sx={{ bgcolor: "background.paper" }}>
+          <ListItem>
             <ListItemText primary="No Tasks" />
           </ListItem>
-        )}
-        {checked.length &&
-          tasks.length &&
-          tasks.map((task) => (
-            <ListItem
-              key={task._id}
-              sx={{ bgcolor: "background.paper" }}
-              disablePadding
-              secondaryAction={
-                <Checkbox
-                  edge="end"
-                  onChange={(e) => {
-                    setChecked((prev) => {
-                      return prev.map((t) => {
-                        if (t._id === task._id) {
-                          t.completed = e.target.checked;
-                        }
-                        return t;
+        </List>
+      )}
+
+      <List disablePadding>
+        {checked.length && tasks.length
+          ? tasks.map((task) => (
+              <ListItem
+                key={task._id}
+                sx={{ bgcolor: "background.paper" }}
+                disablePadding
+                secondaryAction={
+                  <Checkbox
+                    edge="end"
+                    onChange={(e) => {
+                      setChecked((prev) => {
+                        return prev.map((t) => {
+                          if (t._id === task._id) {
+                            t.completed = e.target.checked;
+                          }
+                          return t;
+                        });
                       });
-                    });
-                    updateTask(task._id, e.target.checked);
-                  }}
-                  checked={
-                    checked.find((t) => t._id === task._id)?.completed || false
-                  }
-                />
-              }
-            >
-              <ListItemButton>
-                <ListItemText primary={task.title} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                      updateTask(task._id, e.target.checked);
+                    }}
+                    checked={
+                      checked.find((t) => t._id === task._id)?.completed ||
+                      false
+                    }
+                  />
+                }
+              >
+                <ListItemButton>
+                  <ListItemText primary={task.title} />
+                </ListItemButton>
+              </ListItem>
+            ))
+          : null}
       </List>
     </Box>
   );
