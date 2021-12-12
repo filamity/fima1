@@ -3,6 +3,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Head from "next/head";
 import Layout from "../components/global/Layout";
 import "../styles/globals.css";
+import AuthProvider from "../contexts/AuthContext";
 
 const theme = createTheme({
   typography: {
@@ -10,7 +11,7 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#2c387e",
+      main: "#3f51b5",
     },
   },
   components: {
@@ -28,7 +29,7 @@ const theme = createTheme({
   },
 });
 
-function App({ Component, pageProps }) {
+const App = ({ Component, pageProps }) => {
   return (
     <>
       <Head>
@@ -37,13 +38,15 @@ function App({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <ThemeProvider theme={theme}>
-        <Layout>
-          <CssBaseline />
-          <Component {...pageProps} />
-        </Layout>
+        <AuthProvider>
+          <Layout>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </Layout>
+        </AuthProvider>
       </ThemeProvider>
     </>
   );
-}
+};
 
 export default App;

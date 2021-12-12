@@ -4,9 +4,11 @@
 }
 
 :root {
-  --blue-1: #2c387e;
-  --blue-2: #3f51b5;
-  --blue-3: #939ed5;
+  --blue-1: #c5cae9;
+  --blue-2: #7986cb;
+  --blue-3: #3f51b5;
+  --blue-4: #303f9f;
+  --blue-5: #1a237e;
 }
 
 html, body {
@@ -57,12 +59,20 @@ html, body {
   margin-left: 25px;
 }
 
+.rounded {
+  border-radius: 4px;
+}
+
 .container {
   padding: 3%;
   max-width: 1200px;
   margin: 0 auto;
 }
 
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+}
 .subtitle {
   font-size: 1.5rem;
   font-weight: bold;

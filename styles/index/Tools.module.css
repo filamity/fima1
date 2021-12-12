@@ -1,12 +1,11 @@
 .tools {
-  padding: 15px 20px;
-  background: var(--blue-3); 
   grid-column: 1 / -1;
 }
 
 .toolsgrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
 }
 
 @media screen and (max-width: 900px) {

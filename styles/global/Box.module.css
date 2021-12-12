@@ -1,0 +1,12 @@
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: var(--blue-3);
+  color: white;
+  padding: 10px 20px;
+}
+
+.content {
+  padding: 15px 20px;
+  background: var(--blue-2);
+}

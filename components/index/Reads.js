@@ -1,17 +1,10 @@
-import {
-  Avatar,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import { List, ListItem, ListItemText, Typography } from "@mui/material";
 import styles from "../../styles/index/Reads.module.css";
+import Box from "../global/Box";
 
 const Reads = () => {
   return (
-    <div className={styles.reads}>
-      <div className="subtitle">Reads</div>
+    <Box title="Reads" className={styles.reads}>
       <List sx={{ bgcolor: "background.paper" }}>
         <ListItem alignItems="flex-start">
           <ListItemText
@@ -68,7 +61,7 @@ const Reads = () => {
           />
         </ListItem>
       </List>
-    </div>
+    </Box>
   );
 };
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
@@ -15,11 +16,12 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
 import styles from "../../styles/global/Navbar.module.css";
 
 const Navbar = () => {
+  const { logout, currentUser } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
 
@@ -30,7 +32,7 @@ const Navbar = () => {
       onClick={() => setOpen((prev) => !prev)}
     >
       <List>
-        {["Homework", "Homework", "Homework", "Homework"].map((text, index) => (
+        {["Homework1", "Homework2", "Homework3", "Homework4"].map((text, index) => (
           <ListItem button key={text}>
             <ListItemIcon>
               <InboxIcon />
@@ -41,7 +43,7 @@ const Navbar = () => {
       </List>
       <Divider />
       <List>
-        {["Homework", "Homework", "Homework"].map((text, index) => (
+        {["Homework1", "Homework2", "Homework3"].map((text, index) => (
           <ListItem button key={text}>
             <ListItemIcon>
               <InboxIcon />
@@ -69,23 +71,30 @@ const Navbar = () => {
           <Typography variant="h6" component="div">
             FI-MA1
           </Typography>
-          <div className={styles.accountbutton}>
-            <IconButton size="large" onClick={e => setAnchorEl(e.currentTarget)} color="inherit">
-              <AccountCircle />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              keepMounted
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
-            >
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>My account</MenuItem>
-            </Menu>
-          </div>
+          {currentUser && (
+            <div className={styles.accountbutton}>
+              <IconButton
+                size="large"
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                keepMounted
+                open={Boolean(anchorEl)}
+                onClose={() => setAnchorEl(null)}
+              >
+                <MenuItem>Profile</MenuItem>
+                <MenuItem>My account</MenuItem>
+                <MenuItem onClick={() => logout()}>Log Out</MenuItem>
+              </Menu>
+            </div>
+          )}
         </Toolbar>
       </AppBar>
-      
+
       <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
         <div className={styles.drawerheading}>
           <div>
