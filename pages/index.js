@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import Login from "../components/global/Login";
 import Announcements from "../components/index/Announcements";
+import Notes from "../components/index/Notes";
 import Reads from "../components/index/Reads";
 import Tasks from "../components/index/Tasks";
 import Tools from "../components/index/Tools";
@@ -13,6 +14,7 @@ const Home = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [reads, setReads] = useState([]);
+  const [notes, setNotes] = useState([]);
 
   useEffect(() => {
     if (currentUser) {
@@ -25,10 +27,14 @@ const Home = () => {
       axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
         setTasks(data);
       });
+      axios.get(`/api/notes/${currentUser._id}`).then(({ data: { data } }) => {
+        setNotes(data);
+      });
     } else {
       setAnnouncements([]);
       setReads([]);
       setTasks([]);
+      setNotes([]);
     }
   }, [currentUser]);
 
@@ -46,6 +52,7 @@ const Home = () => {
             />
             <Tasks tasks={tasks} setTasks={setTasks} />
             <Reads reads={reads} setReads={setReads} />
+            <Notes notes={notes} setNotes={setNotes} />
             <Tools />
           </div>
         </>

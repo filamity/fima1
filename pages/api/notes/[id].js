@@ -1,5 +1,6 @@
 import dbConnect from "../../../utils/dbConnect";
 import Note from "../../../models/Note";
+import User from "../../../models/User";
 
 dbConnect();
 
@@ -12,27 +13,43 @@ export default async function (req, res) {
   switch (method) {
     case "GET":
       try {
-        const note = await Note.findById(id);
-        if (!note) {
-          return res
-            .status(400)
-            .json({ success: false, message: "Note not found" });
-        }
-        res.status(200).json({ success: true, data: note });
+        const notes = await Note.find({ user: id });
+        res.status(200).json({ success: true, data: notes });
       } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        res.status(400).json({ success: false, error: error.message });
+      }
+      break;
+    case "POST":
+      try {
+        const user = await User.findById(id);
+        if (!user) {
+          return res.status(404).json({
+            success: false,
+            message: "User not found",
+          });
+        }
+        const note = await Note.create({ ...req.body, user: id });
+        await User.findByIdAndUpdate(
+          id,
+          { $push: { notes: note._id } },
+          { new: true }
+        );
+        res.status(201).json({ success: true, data: note });
+      } catch (error) {
+        res.status(400).json({ success: false, error: error.message });
       }
       break;
     case "PUT":
       try {
-        const note = await Note.findByIdAndUpdate(id, req.body, {
-          new: true,
-          runValidators: true,
-        });
+        const note = await Note.findByIdAndUpdate(
+          id,
+          { ...req.body },
+          { new: true, runValidators: true }
+        );
         if (!note) {
           return res
             .status(400)
-            .json({ success: false, message: "Note not found" });
+            .json({ success: false, message: "No note found" });
         }
         res.status(200).json({ success: true, data: note });
       } catch (error) {
@@ -41,13 +58,18 @@ export default async function (req, res) {
       break;
     case "DELETE":
       try {
-        const note = await Note.deleteOne({ _id: id });
+        const note = await Note.findByIdAndDelete(id);
         if (!note) {
           return res
             .status(400)
-            .json({ success: false, message: "Note not found" });
+            .json({ success: false, message: "No note found" });
         }
-        res.status(200).json({ success: true, data: {} });
+        await User.findByIdAndUpdate(
+          note.user,
+          { $pull: { notes: note._id } },
+          { new: true }
+        );
+        res.status(200).json({ success: true });
       } catch (error) {
         res.status(400).json({ success: false, message: error.message });
       }
