@@ -92,7 +92,10 @@ const Reads = ({ reads, setReads }) => {
               <Add />
             </Button>
             <Button
-              onClick={() => setSelecting((prev) => !prev)}
+              onClick={() => {
+                if (selecting) setSelected([]);
+                setSelecting((prev) => !prev)
+              }}
               color="primary"
             >
               {selecting ? <DoDisturb /> : <Delete />}

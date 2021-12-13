@@ -9,17 +9,26 @@ import {
   Card,
   FormGroup,
   TextField,
+  Chip,
+  ButtonGroup,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import styles from "../../styles/index/Tasks.module.css";
 import Box from "../global/Box";
 import axios from "axios";
-import { Add } from "@mui/icons-material";
+import { Add, Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Tasks = ({ tasks, setTasks }) => {
   const { currentUser } = useAuth();
+  let tasksSortedByDate = tasks.sort((a, b) => {
+    return new Date(a.dueAt) - new Date(b.dueAt);
+  });
+  let uncompletedTasks = tasksSortedByDate.filter(
+    (task) => task.completed === false
+  );
   const [error, setError] = useState("");
+  const [showCompleted, setShowCompleted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [task, setTask] = useState({
     title: "",
@@ -70,11 +79,43 @@ const Tasks = ({ tasks, setTasks }) => {
     setTask((prev) => ({ ...prev, [name]: value }));
   };
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const month = d.toLocaleString("default", { month: "short" });
+    const day = d.getDate();
+    return `${month} ${day}`;
+  };
+
+  const taskStatus = (date) => {
+    const d = new Date(date);
+    const today = new Date();
+
+    if (
+      d.getDate() === today.getDate() &&
+      d.getMonth() === today.getMonth() &&
+      d.getFullYear() === today.getFullYear()
+    ) {
+      return { name: "Today", color: "error" };
+    } else if (d < today) {
+      return { name: "Overdue", color: "error" };
+    } else if (d > today) {
+      return { name: "Upcoming", color: "primary" };
+    }
+  };
+
   return (
     <Box title="Tasks" className={styles.tasks}>
-      <Button onClick={() => setModalOpen(true)} variant="contained">
-        <Add />
-      </Button>
+      <ButtonGroup>
+        <Button onClick={() => setModalOpen(true)} variant="contained">
+          <Add />
+        </Button>
+        <Button
+          onClick={() => setShowCompleted((prev) => !prev)}
+          variant="contained"
+        >
+          {showCompleted ? <VisibilityOff /> : <Visibility />}
+        </Button>
+      </ButtonGroup>
 
       <section className="buffer-10"></section>
 
@@ -122,46 +163,62 @@ const Tasks = ({ tasks, setTasks }) => {
         </Card>
       </Modal>
 
-      {!tasks.length && (
+      {!(showCompleted ? tasksSortedByDate : uncompletedTasks).length && (
         <List sx={{ bgcolor: "background.paper" }}>
           <ListItem>
-            <ListItemText primary="No Tasks" />
+            <ListItemText primary="No Tasks to show" />
           </ListItem>
         </List>
       )}
 
       <List disablePadding>
-        {tasks.length
-          ? tasks.map((task) => (
-              <ListItem
-                key={task._id}
-                sx={{ bgcolor: "background.paper" }}
-                disablePadding
-                secondaryAction={
-                  <Checkbox
-                    edge="end"
-                    onChange={(e) => {
-                      setTasks((prev) => {
-                        return prev.map((t) => {
-                          if (t._id === task._id) {
-                            t.completed = e.target.checked;
-                          }
-                          return t;
+        {tasksSortedByDate.length
+          ? (showCompleted ? tasksSortedByDate : uncompletedTasks).map(
+              (task) => (
+                <ListItem
+                  key={task._id}
+                  sx={{ bgcolor: "background.paper" }}
+                  disablePadding
+                  secondaryAction={
+                    <Checkbox
+                      edge="end"
+                      onChange={(e) => {
+                        setTasks((prev) => {
+                          return prev.map((t) => {
+                            if (t._id === task._id) {
+                              t.completed = e.target.checked;
+                            }
+                            return t;
+                          });
                         });
-                      });
-                      updateTask(task._id, e.target.checked);
-                    }}
-                    checked={
-                      tasks.find((t) => t._id === task._id)?.completed || false
-                    }
-                  />
-                }
-              >
-                <ListItemButton>
-                  <ListItemText primary={task.title} />
-                </ListItemButton>
-              </ListItem>
-            ))
+                        updateTask(task._id, e.target.checked);
+                      }}
+                      checked={
+                        tasks.find((t) => t._id === task._id)?.completed ||
+                        false
+                      }
+                    />
+                  }
+                >
+                  <ListItemButton>
+                    <ListItemText
+                      primary={
+                        <>
+                          <span
+                            className="chip"
+                            data-status={taskStatus(task.dueAt).color}
+                          >
+                            {taskStatus(task.dueAt).name}
+                          </span>
+                          <span className="inlinebuffer-10"></span>
+                          {task.title}
+                        </>
+                      }
+                    />
+                  </ListItemButton>
+                </ListItem>
+              )
+            )
           : null}
       </List>
     </Box>

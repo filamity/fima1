@@ -79,6 +79,7 @@ const Announcements = ({ announcements, setAnnouncements }) => {
   };
 
   const handleAccordion = (panel) => (event, isExpanded) => {
+    if (event.target.classList.contains("PrivateSwitchBase-input")) return;
     setExpanded(isExpanded ? panel : false);
   };
 
@@ -96,7 +97,10 @@ const Announcements = ({ announcements, setAnnouncements }) => {
               <Add />
             </Button>
             <Button
-              onClick={() => setSelecting((prev) => !prev)}
+              onClick={() => {
+                if (selecting) setSelected([]);
+                setSelecting((prev) => !prev);
+              }}
               color="primary"
             >
               {selecting ? <DoDisturb /> : <Delete />}

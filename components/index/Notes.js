@@ -123,7 +123,13 @@ const Notes = ({ notes, setNotes }) => {
         >
           <Add />
         </Button>
-        <Button onClick={() => setSelecting((prev) => !prev)} color="primary">
+        <Button
+          onClick={() => {
+            if (selecting) setSelected([]);
+            setSelecting((prev) => !prev);
+          }}
+          color="primary"
+        >
           {selecting ? <DoDisturb /> : <Delete />}
         </Button>
         {selected.length && selecting ? (
@@ -191,35 +197,38 @@ const Notes = ({ notes, setNotes }) => {
       <div className={styles.notegrid}>
         {notes.length
           ? notes.map((note) => (
-              <Card key={note._id}>
+              <Card key={note._id} className={styles.notecard}>
                 <CardContent>
                   <Typography variant="h5" component="div">
                     {note.title}
                   </Typography>
                   <Typography variant="body2">{note.description}</Typography>
                 </CardContent>
-                <Divider />
-                <CardActions>
-                  <IconButton
-                    onClick={() => editNote(note._id)}
-                    color="primary"
-                  >
-                    <Edit />
-                  </IconButton>
-                  {selecting && (
-                    <Checkbox
-                      className={styles.checkbox}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelected([...selected, note._id]);
-                        } else {
-                          setSelected(selected.filter((id) => id !== note._id));
-                        }
-                      }}
-                      checked={selected.includes(note._id)}
-                    />
-                  )}
-                </CardActions>
+                <section style={{height: "56px"}}></section>
+                <div className={styles.notecardactions}>
+                  <Divider />
+                  <CardActions>
+                    <IconButton
+                      onClick={() => editNote(note._id)}
+                      color="primary"
+                    >
+                      <Edit />
+                    </IconButton>
+                    {selecting && (
+                      <Checkbox
+                        className={styles.checkbox}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelected([...selected, note._id]);
+                          } else {
+                            setSelected(selected.filter((id) => id !== note._id));
+                          }
+                        }}
+                        checked={selected.includes(note._id)}
+                      />
+                    )}
+                  </CardActions>
+                </div>
               </Card>
             ))
           : null}

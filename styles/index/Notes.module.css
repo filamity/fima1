@@ -33,3 +33,13 @@
     grid-template-columns: repeat(1, 1fr);
   }
 }
+
+.notecard {
+  position: relative;
+}
+.notecardactions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
