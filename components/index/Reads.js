@@ -18,7 +18,7 @@ import Box from "../global/Box";
 import axios from "axios";
 import { Add, Delete, DoDisturb } from "@mui/icons-material";
 
-const Reads = ({ reads }) => {
+const Reads = ({ reads, setReads }) => {
   const { currentUser } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState("");
@@ -33,6 +33,12 @@ const Reads = ({ reads }) => {
   useEffect(() => {
     setError("");
   }, [read]);
+
+  const fetchReads = () => {
+    axios.get("/api/reads").then(({ data: { data } }) => {
+      setReads(data);
+    });
+  };
 
   const createRead = (e) => {
     e.preventDefault();
@@ -53,7 +59,7 @@ const Reads = ({ reads }) => {
           description: "",
           link: "",
         });
-        window.location.reload();
+        fetchReads();
       })
       .catch((err) => {
         setError(err.message);
@@ -61,11 +67,15 @@ const Reads = ({ reads }) => {
   };
 
   const deleteReads = () => {
-    selected.forEach((read) => {
-      axios.delete(`/api/reads/${read}`);
+    selected.forEach((read, idx, arr) => {
+      axios.delete(`/api/reads/${read}`).then(() => {
+        if (idx === arr.length - 1) {
+          fetchReads();
+          setSelected([]);
+          setSelecting(false);
+        }
+      });
     });
-    setSelected([]);
-    setSelecting(false);
   };
 
   const handleChange = (event) => {

@@ -17,9 +17,8 @@ import Box from "../global/Box";
 import axios from "axios";
 import { Add } from "@mui/icons-material";
 
-const Tasks = ({ tasks }) => {
+const Tasks = ({ tasks, setTasks }) => {
   const { currentUser } = useAuth();
-  const [checked, setChecked] = useState(tasks);
   const [error, setError] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [task, setTask] = useState({
@@ -29,24 +28,19 @@ const Tasks = ({ tasks }) => {
   });
 
   useEffect(() => {
-    setChecked(tasks);
-  }, [tasks]);
-
-  useEffect(() => {
     setError("");
   }, [task]);
 
+  const fetchTasks = () => {
+    axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
+      setTasks(data);
+    });
+  };
+
   const updateTask = (taskId, completed) => {
-    axios
-      .put(`/api/tasks/${taskId}`, {
-        completed: completed,
-      })
-      .then((res) => {
-        // console.log(res.data);
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
+    axios.put(`/api/tasks/${taskId}`, {
+      completed: completed,
+    });
   };
 
   const createTask = (e) => {
@@ -64,7 +58,7 @@ const Tasks = ({ tasks }) => {
           description: "",
           dueAt: "",
         });
-        window.location.reload();
+        fetchTasks();
       })
       .catch((err) => {
         setError(err.message);
@@ -95,7 +89,7 @@ const Tasks = ({ tasks }) => {
                 onChange={handleChange}
                 label="Title"
                 variant="standard"
-                // required
+                required
               />
               <section className="buffer-20"></section>
               <TextField
@@ -128,7 +122,7 @@ const Tasks = ({ tasks }) => {
         </Card>
       </Modal>
 
-      {!checked.length && (
+      {!tasks.length && (
         <List sx={{ bgcolor: "background.paper" }}>
           <ListItem>
             <ListItemText primary="No Tasks" />
@@ -137,7 +131,7 @@ const Tasks = ({ tasks }) => {
       )}
 
       <List disablePadding>
-        {checked.length && tasks.length
+        {tasks.length
           ? tasks.map((task) => (
               <ListItem
                 key={task._id}
@@ -147,7 +141,7 @@ const Tasks = ({ tasks }) => {
                   <Checkbox
                     edge="end"
                     onChange={(e) => {
-                      setChecked((prev) => {
+                      setTasks((prev) => {
                         return prev.map((t) => {
                           if (t._id === task._id) {
                             t.completed = e.target.checked;
@@ -158,8 +152,7 @@ const Tasks = ({ tasks }) => {
                       updateTask(task._id, e.target.checked);
                     }}
                     checked={
-                      checked.find((t) => t._id === task._id)?.completed ||
-                      false
+                      tasks.find((t) => t._id === task._id)?.completed || false
                     }
                   />
                 }

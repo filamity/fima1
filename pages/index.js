@@ -25,6 +25,10 @@ const Home = () => {
       axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
         setTasks(data);
       });
+    } else {
+      setAnnouncements([]);
+      setReads([]);
+      setTasks([]);
     }
   }, [currentUser]);
 
@@ -36,9 +40,12 @@ const Home = () => {
             Welcome, {currentUser.firstName} {currentUser.lastName}!
           </h1>
           <div className={styles.indexgrid}>
-            <Announcements announcements={announcements} />
-            <Tasks tasks={tasks} />
-            <Reads reads={reads} />
+            <Announcements
+              announcements={announcements}
+              setAnnouncements={setAnnouncements}
+            />
+            <Tasks tasks={tasks} setTasks={setTasks} />
+            <Reads reads={reads} setReads={setReads} />
             <Tools />
           </div>
         </>

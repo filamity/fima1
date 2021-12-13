@@ -27,7 +27,7 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 
-const Announcements = ({ announcements }) => {
+const Announcements = ({ announcements, setAnnouncements }) => {
   const { currentUser } = useAuth();
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -43,6 +43,12 @@ const Announcements = ({ announcements }) => {
     setError("");
   }, [announcement]);
 
+  const fetchAnnouncements = () => {
+    axios.get("/api/announcements").then(({ data: { data } }) => {
+      setAnnouncements(data);
+    });
+  };
+
   const createAnnouncement = (e) => {
     e.preventDefault();
     axios
@@ -53,7 +59,7 @@ const Announcements = ({ announcements }) => {
           title: "",
           description: "",
         });
-        window.location.reload();
+        fetchAnnouncements();
       })
       .catch((err) => {
         setError(err.message);
@@ -61,11 +67,15 @@ const Announcements = ({ announcements }) => {
   };
 
   const deleteAnnouncements = () => {
-    selected.forEach((announcement) => {
-      axios.delete(`/api/announcements/${announcement}`);
+    selected.forEach((announcement, idx, arr) => {
+      axios.delete(`/api/announcements/${announcement}`).then(() => {
+        if (idx === arr.length - 1) {
+          fetchAnnouncements();
+          setSelected([]);
+          setSelecting(false);
+        }
+      });
     });
-    setSelected([]);
-    setSelecting(false);
   };
 
   const handleAccordion = (panel) => (event, isExpanded) => {

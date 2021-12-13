@@ -1,6 +1,7 @@
 import dbConnect from "../../../utils/dbConnect";
 import User from "../../../models/User";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 dbConnect();
 
@@ -19,11 +20,12 @@ export default async function (req, res) {
     case "POST":
       try {
         const { firstName, lastName, username, password, role } = req.body;
+        const encryptedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
           firstName,
           lastName,
           username,
-          password,
+          password: encryptedPassword,
           role,
           tasks: [],
           notes: [],

@@ -14,6 +14,7 @@
     "@mui/material": "^5.2.3",
     "@mui/styles": "^5.2.3",
     "axios": "^0.24.0",
+    "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.2.1",
     "mongoose": "^6.1.1",

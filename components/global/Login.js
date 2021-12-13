@@ -6,7 +6,6 @@ import {
   FormGroup,
   Card,
   Link,
-  Divider,
   ToggleButtonGroup,
   ToggleButton,
 } from "@mui/material";
@@ -34,8 +33,6 @@ const Login = () => {
       setError(err.message);
     });
   };
-
-  console.log(error);
 
   const handleRegister = (e) => {
     e.preventDefault();
