@@ -12,6 +12,10 @@ const AnnouncementSchema = new mongoose.Schema({
     required: [true, "Description is required"],
     maxlength: [500, "Description must be less than 500 characters"],
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  }
 });
 
 module.exports = mongoose.models.Announcement || mongoose.model("Announcement", AnnouncementSchema);

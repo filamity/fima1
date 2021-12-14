@@ -5,8 +5,8 @@ import {
   CardMedia,
   Typography,
 } from "@mui/material";
-import styles from "../../../styles/index/Tools.module.css";
-import Box from "../../global/Box";
+import styles from "../../styles/index/Links.module.css";
+import Box from "../global/Box";
 
 const Tools = () => {
   const tools = [

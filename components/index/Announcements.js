@@ -20,7 +20,6 @@ import {
 import axios from "axios";
 import {
   Add,
-  Remove,
   Delete,
   ExpandMore,
   DoDisturb,
@@ -29,6 +28,9 @@ import { useAuth } from "../../contexts/AuthContext";
 
 const Announcements = ({ announcements, setAnnouncements }) => {
   const { currentUser } = useAuth();
+  let announcementsSortedByDate = announcements.sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+  );
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selecting, setSelecting] = useState(false);
@@ -86,6 +88,13 @@ const Announcements = ({ announcements, setAnnouncements }) => {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setAnnouncement((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const month = d.toLocaleString("default", { month: "short" });
+    const day = d.getDate();
+    return `${month} ${day}`;
   };
 
   return (
@@ -149,7 +158,7 @@ const Announcements = ({ announcements, setAnnouncements }) => {
         </Card>
       </Modal>
 
-      {!announcements.length && (
+      {!announcementsSortedByDate.length && (
         <List sx={{ bgcolor: "background.paper" }}>
           <ListItem>
             <ListItemText primary="No Announcements" />
@@ -157,15 +166,21 @@ const Announcements = ({ announcements, setAnnouncements }) => {
         </List>
       )}
 
-      {announcements.length
-        ? announcements.map((announcement) => (
+      {announcementsSortedByDate.length
+        ? announcementsSortedByDate.map((announcement) => (
             <Accordion
               key={announcement._id}
               expanded={expanded === announcement._id}
               onChange={handleAccordion(announcement._id)}
             >
               <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>{announcement.title}</Typography>
+                <Typography>
+                  <span className="chip">
+                    {formatDate(announcement.createdAt)}
+                  </span>
+                  <span className="inlinebuffer-10"></span>
+                  {announcement.title}
+                </Typography>
                 {selecting ? (
                   <Checkbox
                     edge="end"

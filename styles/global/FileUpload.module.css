@@ -1,0 +1,23 @@
+.dropzone {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  padding: 25px;
+  text-align: center;
+  border: 2px dashed rgba(0, 0, 0, 1);
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dropzone[data-status="normal"] {
+  opacity: 0.5;
+}
+.dropzone[data-status="active"] {
+  opacity: 1;
+}
+
+.dropzonetext {
+  font-size: 1.3rem;
+  font-weight: bold;
+}

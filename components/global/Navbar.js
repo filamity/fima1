@@ -15,8 +15,9 @@ import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { Collections, Home, Logout } from "@mui/icons-material";
+import Link from "next/link";
 
 import styles from "../../styles/global/Navbar.module.css";
 
@@ -32,25 +33,22 @@ const Navbar = () => {
       onClick={() => setOpen((prev) => !prev)}
     >
       <List>
-        {["Homework1", "Homework2", "Homework3", "Homework4"].map((text, index) => (
-          <ListItem button key={text}>
+        <Link href="/" passHref>
+          <ListItem button component="a">
             <ListItemIcon>
-              <InboxIcon />
+              <Home />
             </ListItemIcon>
-            <ListItemText primary={text} />
+            <ListItemText primary="Home" />
           </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {["Homework1", "Homework2", "Homework3"].map((text, index) => (
-          <ListItem button key={text}>
+        </Link>
+        <Link href="/gallery" passHref>
+          <ListItem button component="a">
             <ListItemIcon>
-              <InboxIcon />
+              <Collections />
             </ListItemIcon>
-            <ListItemText primary={text} />
+            <ListItemText primary="Gallery" />
           </ListItem>
-        ))}
+        </Link>
       </List>
     </Box>
   );
@@ -68,30 +66,53 @@ const Navbar = () => {
             <MenuIcon />
           </IconButton>
           <span className="inlinebuffer-10"></span>
-          <Typography variant="h6" component="div">
-            FI-MA1
+          <Typography variant="h6" component="div" className={styles.link}>
+            <Link href="/">FI-MA1</Link>
           </Typography>
-          {currentUser && (
-            <div className={styles.accountbutton}>
-              <IconButton
-                size="large"
-                onClick={(e) => setAnchorEl(e.currentTarget)}
-                color="inherit"
-              >
-                <AccountCircle />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={() => setAnchorEl(null)}
-              >
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>My account</MenuItem>
-                <MenuItem onClick={() => logout()}>Log Out</MenuItem>
-              </Menu>
-            </div>
-          )}
+          <div className={styles.accountbutton}>
+            <IconButton
+              size="large"
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              color="inherit"
+            >
+              <AccountCircle />
+            </IconButton>
+          </div>
+          <Menu
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={() => setAnchorEl(null)}
+          >
+            {currentUser ? (
+              <div>
+                <Box ml={2} mb={1} mt={1} mr={2}>
+                  <Typography variant="h6">
+                    {currentUser.firstName} {currentUser.lastName}
+                  </Typography>
+                  <Typography className="capitalize" color="text.secondary">
+                    {currentUser.role}
+                  </Typography>
+                </Box>
+                {/* <MenuItem>
+                  <ListItemIcon>
+                    <Settings fontSize="small" />
+                  </ListItemIcon>
+                  Settings
+                </MenuItem> */}
+                <MenuItem onClick={() => logout()}>
+                  <ListItemIcon>
+                    <Logout fontSize="small" />
+                  </ListItemIcon>
+                  Logout
+                </MenuItem>
+              </div>
+            ) : (
+              <Box ml={2} mb={1} mt={1} mr={2}>
+                <Typography>You are currently not logged in.</Typography>
+              </Box>
+            )}
+          </Menu>
         </Toolbar>
       </AppBar>
 

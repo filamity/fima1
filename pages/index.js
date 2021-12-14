@@ -5,7 +5,7 @@ import Announcements from "../components/index/Announcements";
 import Notes from "../components/index/Notes";
 import Reads from "../components/index/Reads";
 import Tasks from "../components/index/Tasks";
-import Tools from "../components/index/Tools";
+import Links from "../components/index/Links";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/index/Home.module.css";
 
@@ -53,7 +53,7 @@ const Home = () => {
             <Tasks tasks={tasks} setTasks={setTasks} />
             <Reads reads={reads} setReads={setReads} />
             <Notes notes={notes} setNotes={setNotes} />
-            <Tools />
+            <Links />
           </div>
         </>
       )}

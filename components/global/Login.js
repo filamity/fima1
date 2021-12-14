@@ -13,7 +13,7 @@ import Box from "./Box";
 import { useAuth } from "../../contexts/AuthContext";
 
 const Login = () => {
-  const { login, register } = useAuth();
+  const { currentUser, login, register } = useAuth();
   const [hasAccount, setHasAccount] = useState(true);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -24,7 +24,8 @@ const Login = () => {
 
   useEffect(() => {
     setError("");
-  }, [hasAccount, firstName, lastName, username, password, role]);
+    return () => setError("");
+  }, [firstName, lastName, username, password]);
 
   const handleLogin = (e) => {
     e.preventDefault();

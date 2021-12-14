@@ -98,3 +98,11 @@ html, body {
 .chip[data-status="primary"] {
   background-color: var(--blue-3);
 }
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.disablepadding {
+  padding: 0 !important;
+}
