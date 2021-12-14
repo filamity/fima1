@@ -8,26 +8,29 @@ import {
 import styles from "../../styles/index/Links.module.css";
 import Box from "../global/Box";
 
-const Tools = () => {
-  const tools = [
+const Links = () => {
+  const links = [
     {
       name: "Desmos",
       url: "https://www.desmos.com/calculator",
-      image:
-        "/static/images/desmos.png",
+      image: "/static/images/desmos.png",
     },
     {
       name: "Firefly",
       url: "https://harrowschool.fireflycloud.net/boys-dashboard",
-      image:
-        "/static/images/firefly.png",
+      image: "/static/images/firefly.png",
+    },
+    {
+      name: "Gallery",
+      url: "/gallery",
+      image: "/static/images/gallery.jpg",
     },
   ];
 
   return (
-    <Box title="Tools" className={styles.tools}>
-      <div className={styles.toolsgrid}>
-        {tools.map((tool) => (
+    <Box title="Links" className={styles.links}>
+      <div className={styles.linksgrid}>
+        {links.map((tool) => (
           <Card className={styles.tool} key={tool.name}>
             <CardActionArea
               href={tool.url}
@@ -57,4 +60,4 @@ const Tools = () => {
   );
 };
 
-export default Tools;
+export default Links;
