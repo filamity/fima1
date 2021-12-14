@@ -18,12 +18,7 @@ import {
   ListItemText,
 } from "@mui/material";
 import axios from "axios";
-import {
-  Add,
-  Delete,
-  ExpandMore,
-  DoDisturb,
-} from "@mui/icons-material";
+import { Add, Delete, ExpandMore, DoDisturb } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 
 const Announcements = ({ announcements, setAnnouncements }) => {
@@ -184,7 +179,11 @@ const Announcements = ({ announcements, setAnnouncements }) => {
                 {selecting ? (
                   <Checkbox
                     edge="end"
-                    className={styles.checkbox}
+                    sx={{
+                      position: "absolute",
+                      right: "50px",
+                      top: "3px",
+                    }}
                     onChange={(e) => {
                       if (e.target.checked) {
                         setSelected((prev) => [...prev, announcement._id]);

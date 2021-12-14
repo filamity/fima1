@@ -11,6 +11,11 @@ import Box from "../global/Box";
 const Links = () => {
   const links = [
     {
+      name: "Gallery",
+      url: "/gallery",
+      image: "/static/images/gallery.jpg",
+    },
+    {
       name: "Desmos",
       url: "https://www.desmos.com/calculator",
       image: "/static/images/desmos.png",
@@ -19,11 +24,6 @@ const Links = () => {
       name: "Firefly",
       url: "https://harrowschool.fireflycloud.net/boys-dashboard",
       image: "/static/images/firefly.png",
-    },
-    {
-      name: "Gallery",
-      url: "/gallery",
-      image: "/static/images/gallery.jpg",
     },
   ];
 
