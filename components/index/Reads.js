@@ -3,6 +3,7 @@ import {
   ButtonGroup,
   Card,
   Checkbox,
+  CircularProgress,
   FormGroup,
   Link,
   List,
@@ -18,8 +19,10 @@ import Box from "../global/Box";
 import axios from "axios";
 import { Add, Delete, DoDisturb } from "@mui/icons-material";
 
-const Reads = ({ reads, setReads }) => {
+const Reads = () => {
   const { currentUser } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [reads, setReads] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState("");
   const [selecting, setSelecting] = useState(false);
@@ -31,17 +34,32 @@ const Reads = ({ reads, setReads }) => {
   });
 
   useEffect(() => {
+    setLoading(true);
+    if (currentUser) {
+      axios.get("/api/reads").then(({ data: { data } }) => {
+        setReads(data);
+        setLoading(false);
+      });
+    } else {
+      setReads([]);
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
     setError("");
   }, [read]);
 
-  const fetchReads = () => {
+  const fetchReads = (cb) => {
     axios.get("/api/reads").then(({ data: { data } }) => {
       setReads(data);
+      cb();
     });
   };
 
   const createRead = (e) => {
     e.preventDefault();
+    setLoading(true);
     let formattedLink = read.link;
     if (!/^https?:\/\//i.test(formattedLink)) {
       formattedLink = `http://${formattedLink}`;
@@ -59,7 +77,7 @@ const Reads = ({ reads, setReads }) => {
           description: "",
           link: "",
         });
-        fetchReads();
+        fetchReads(() => setLoading(false));
       })
       .catch((err) => {
         setError(err.message);
@@ -67,10 +85,11 @@ const Reads = ({ reads, setReads }) => {
   };
 
   const deleteReads = () => {
+    setLoading(true);
     selected.forEach((read, idx, arr) => {
       axios.delete(`/api/reads/${read}`).then(() => {
         if (idx === arr.length - 1) {
-          fetchReads();
+          fetchReads(() => setLoading(false));
           setSelected([]);
           setSelecting(false);
         }
@@ -94,7 +113,7 @@ const Reads = ({ reads, setReads }) => {
             <Button
               onClick={() => {
                 if (selecting) setSelected([]);
-                setSelecting((prev) => !prev)
+                setSelecting((prev) => !prev);
               }}
               color="primary"
             >
@@ -152,43 +171,51 @@ const Reads = ({ reads, setReads }) => {
         </Card>
       </Modal>
 
-      <List sx={{ bgcolor: "background.paper" }}>
-        {!reads.length && (
-          <ListItem alignItems="flex-start">
-            <ListItemText primary="No Reads" />
-          </ListItem>
-        )}
-        {reads.length
-          ? reads.map((read) => (
-              <ListItem
-                key={read._id}
-                alignItems="flex-start"
-                secondaryAction={
-                  selecting ? (
-                    <Checkbox
-                      edge="end"
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelected((prev) => [...prev, read._id]);
-                        } else {
-                          setSelected((prev) =>
-                            prev.filter((id) => id !== read._id)
-                          );
-                        }
-                      }}
-                      checked={selected.includes(read._id)}
-                    />
-                  ) : null
-                }
-              >
-                <ListItemText
-                  primary={<Link href={read.link}>{read.title}</Link>}
-                  secondary={read.description}
-                />
-              </ListItem>
-            ))
-          : null}
-      </List>
+      {loading && (
+        <div className="loading" style={{ color: "white" }}>
+          <CircularProgress color="inherit" />
+        </div>
+      )}
+
+      {!loading && (
+        <List sx={{ bgcolor: "background.paper" }}>
+          {!reads.length && (
+            <ListItem alignItems="flex-start">
+              <ListItemText primary="No Reads" />
+            </ListItem>
+          )}
+          {reads.length
+            ? reads.map((read) => (
+                <ListItem
+                  key={read._id}
+                  alignItems="flex-start"
+                  secondaryAction={
+                    selecting ? (
+                      <Checkbox
+                        edge="end"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelected((prev) => [...prev, read._id]);
+                          } else {
+                            setSelected((prev) =>
+                              prev.filter((id) => id !== read._id)
+                            );
+                          }
+                        }}
+                        checked={selected.includes(read._id)}
+                      />
+                    ) : null
+                  }
+                >
+                  <ListItemText
+                    primary={<Link href={read.link}>{read.title}</Link>}
+                    secondary={read.description}
+                  />
+                </ListItem>
+              ))
+            : null}
+        </List>
+      )}
     </Box>
   );
 };

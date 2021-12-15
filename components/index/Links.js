@@ -34,7 +34,6 @@ const Links = () => {
           <Card className={styles.tool} key={tool.name}>
             <CardActionArea
               href={tool.url}
-              target="_blank"
               rel="noopener noreferrer"
             >
               <CardMedia

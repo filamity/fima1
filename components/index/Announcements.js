@@ -16,16 +16,19 @@ import {
   List,
   ListItem,
   ListItemText,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { Add, Delete, ExpandMore, DoDisturb } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 
-const Announcements = ({ announcements, setAnnouncements }) => {
+const Announcements = () => {
   const { currentUser } = useAuth();
+  const [announcements, setAnnouncements] = useState([]);
   let announcementsSortedByDate = announcements.sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
   );
+  const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [selecting, setSelecting] = useState(false);
@@ -37,17 +40,32 @@ const Announcements = ({ announcements, setAnnouncements }) => {
   });
 
   useEffect(() => {
+    setLoading(true);
+    if (currentUser) {
+      axios.get("/api/announcements").then(({ data: { data } }) => {
+        setAnnouncements(data);
+        setLoading(false);
+      });
+    } else {
+      setAnnouncements([]);
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
     setError("");
   }, [announcement]);
 
-  const fetchAnnouncements = () => {
+  const fetchAnnouncements = (cb) => {
     axios.get("/api/announcements").then(({ data: { data } }) => {
       setAnnouncements(data);
+      cb();
     });
   };
 
   const createAnnouncement = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios
       .post("/api/announcements", announcement)
       .then((res) => {
@@ -56,7 +74,7 @@ const Announcements = ({ announcements, setAnnouncements }) => {
           title: "",
           description: "",
         });
-        fetchAnnouncements();
+        fetchAnnouncements(() => setLoading(false));
       })
       .catch((err) => {
         setError(err.message);
@@ -64,10 +82,11 @@ const Announcements = ({ announcements, setAnnouncements }) => {
   };
 
   const deleteAnnouncements = () => {
+    setLoading(true);
     selected.forEach((announcement, idx, arr) => {
       axios.delete(`/api/announcements/${announcement}`).then(() => {
         if (idx === arr.length - 1) {
-          fetchAnnouncements();
+          fetchAnnouncements(() => setLoading(false));
           setSelected([]);
           setSelecting(false);
         }
@@ -118,6 +137,7 @@ const Announcements = ({ announcements, setAnnouncements }) => {
           <section className="buffer-10"></section>
         </>
       )}
+
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Card className={styles.card}>
           <div className="title">New Announcement</div>
@@ -153,55 +173,65 @@ const Announcements = ({ announcements, setAnnouncements }) => {
         </Card>
       </Modal>
 
-      {!announcementsSortedByDate.length && (
-        <List sx={{ bgcolor: "background.paper" }}>
-          <ListItem>
-            <ListItemText primary="No Announcements" />
-          </ListItem>
-        </List>
+      {loading && (
+        <div className="loading" style={{ color: "white" }}>
+          <CircularProgress color="inherit" />
+        </div>
       )}
 
-      {announcementsSortedByDate.length
-        ? announcementsSortedByDate.map((announcement) => (
-            <Accordion
-              key={announcement._id}
-              expanded={expanded === announcement._id}
-              onChange={handleAccordion(announcement._id)}
-            >
-              <AccordionSummary expandIcon={<ExpandMore />}>
-                <Typography>
-                  <span className="chip">
-                    {formatDate(announcement.createdAt)}
-                  </span>
-                  <span className="inlinebuffer-10"></span>
-                  {announcement.title}
-                </Typography>
-                {selecting ? (
-                  <Checkbox
-                    edge="end"
-                    sx={{
-                      position: "absolute",
-                      right: "50px",
-                      top: "3px",
-                    }}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setSelected((prev) => [...prev, announcement._id]);
-                      } else {
-                        setSelected((prev) =>
-                          prev.filter((id) => id !== announcement._id)
-                        );
-                      }
-                    }}
-                    checked={selected.includes(announcement._id)}
-                  />
-                ) : null}
-              </AccordionSummary>
-              <AccordionDetails>
-                <Typography>{announcement.description}</Typography>
-              </AccordionDetails>
-            </Accordion>
-          ))
+      {!loading
+        ? !announcementsSortedByDate.length && (
+            <List sx={{ bgcolor: "background.paper" }}>
+              <ListItem>
+                <ListItemText primary="No Announcements" />
+              </ListItem>
+            </List>
+          )
+        : null}
+
+      {!loading
+        ? announcementsSortedByDate.length
+          ? announcementsSortedByDate.map((announcement) => (
+              <Accordion
+                key={announcement._id}
+                expanded={expanded === announcement._id}
+                onChange={handleAccordion(announcement._id)}
+              >
+                <AccordionSummary expandIcon={<ExpandMore />}>
+                  <Typography>
+                    <span className="chip">
+                      {formatDate(announcement.createdAt)}
+                    </span>
+                    <span className="inlinebuffer-10"></span>
+                    {announcement.title}
+                  </Typography>
+                  {selecting ? (
+                    <Checkbox
+                      edge="end"
+                      sx={{
+                        position: "absolute",
+                        right: "50px",
+                        top: "3px",
+                      }}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelected((prev) => [...prev, announcement._id]);
+                        } else {
+                          setSelected((prev) =>
+                            prev.filter((id) => id !== announcement._id)
+                          );
+                        }
+                      }}
+                      checked={selected.includes(announcement._id)}
+                    />
+                  ) : null}
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>{announcement.description}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            ))
+          : null
         : null}
     </Box>
   );

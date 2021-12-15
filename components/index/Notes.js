@@ -15,6 +15,7 @@ import {
   TextField,
   Typography,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -22,8 +23,10 @@ import { useAuth } from "../../contexts/AuthContext";
 import styles from "../../styles/index/Notes.module.css";
 import Box from "../global/Box";
 
-const Notes = ({ notes, setNotes }) => {
+const Notes = () => {
   const { currentUser } = useAuth();
+  const [notes, setNotes] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -35,17 +38,32 @@ const Notes = ({ notes, setNotes }) => {
   });
 
   useEffect(() => {
+    setLoading(true);
+    if (currentUser) {
+      axios.get(`/api/notes/${currentUser._id}`).then(({ data: { data } }) => {
+        setNotes(data);
+        setLoading(false);
+      });
+    } else {
+      setNotes([]);
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
     setError("");
   }, [note]);
 
-  const fetchNotes = () => {
+  const fetchNotes = (cb) => {
     axios.get(`/api/notes/${currentUser._id}`).then(({ data: { data } }) => {
       setNotes(data);
+      cb();
     });
   };
 
   const createNote = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios
       .post(`/api/notes/${currentUser._id}`, {
         title: note.title,
@@ -57,7 +75,7 @@ const Notes = ({ notes, setNotes }) => {
           title: "",
           description: "",
         });
-        fetchNotes();
+        fetchNotes(() => setLoading(false));
       })
       .catch((err) => {
         setError(err.message);
@@ -76,6 +94,7 @@ const Notes = ({ notes, setNotes }) => {
 
   const updateNote = (e) => {
     e.preventDefault();
+    setLoading(true);
     let noteToUpdate = notes.find((note) => note._id === editing);
     axios
       .put(`/api/notes/${noteToUpdate._id}`, {
@@ -88,7 +107,7 @@ const Notes = ({ notes, setNotes }) => {
           title: "",
           description: "",
         });
-        fetchNotes();
+        fetchNotes(() => setLoading(false));
       })
       .catch((err) => {
         setError(err.message);
@@ -96,10 +115,11 @@ const Notes = ({ notes, setNotes }) => {
   };
 
   const deleteNotes = () => {
+    setLoading(true);
     selected.forEach((note, idx, arr) => {
       axios.delete(`/api/notes/${note}`).then(() => {
         if (idx === arr.length - 1) {
-          fetchNotes();
+          fetchNotes(() => setLoading(false));
           setSelected([]);
           setSelecting(false);
         }
@@ -186,53 +206,65 @@ const Notes = ({ notes, setNotes }) => {
         </Card>
       </Modal>
 
-      {!notes.length && (
-        <List sx={{ bgcolor: "background.paper" }}>
-          <ListItem>
-            <ListItemText primary="No Notes" />
-          </ListItem>
-        </List>
+      {loading && (
+        <div className="loading" style={{ color: "white" }}>
+          <CircularProgress color="inherit" />
+        </div>
       )}
 
-      <div className={styles.notegrid}>
-        {notes.length
-          ? notes.map((note) => (
-              <Card key={note._id} className={styles.notecard}>
-                <CardContent>
-                  <Typography variant="h5" component="div">
-                    {note.title}
-                  </Typography>
-                  <Typography variant="body2">{note.description}</Typography>
-                </CardContent>
-                <section style={{height: "56px"}}></section>
-                <div className={styles.notecardactions}>
-                  <Divider />
-                  <CardActions>
-                    <IconButton
-                      onClick={() => editNote(note._id)}
-                      color="primary"
-                    >
-                      <Edit />
-                    </IconButton>
-                    {selecting && (
-                      <Checkbox
-                        className={styles.checkbox}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelected([...selected, note._id]);
-                          } else {
-                            setSelected(selected.filter((id) => id !== note._id));
-                          }
-                        }}
-                        checked={selected.includes(note._id)}
-                      />
-                    )}
-                  </CardActions>
-                </div>
-              </Card>
-            ))
-          : null}
-      </div>
+      {!loading
+        ? !notes.length && (
+            <List sx={{ bgcolor: "background.paper" }}>
+              <ListItem>
+                <ListItemText primary="No Notes" />
+              </ListItem>
+            </List>
+          )
+        : null}
+
+      {!loading && (
+        <div className={styles.notegrid}>
+          {notes.length
+            ? notes.map((note) => (
+                <Card key={note._id} className={styles.notecard}>
+                  <CardContent>
+                    <Typography variant="h5" component="div">
+                      {note.title}
+                    </Typography>
+                    <Typography variant="body2">{note.description}</Typography>
+                  </CardContent>
+                  <section style={{ height: "56px" }}></section>
+                  <div className={styles.notecardactions}>
+                    <Divider />
+                    <CardActions>
+                      <IconButton
+                        onClick={() => editNote(note._id)}
+                        color="primary"
+                      >
+                        <Edit />
+                      </IconButton>
+                      {selecting && (
+                        <Checkbox
+                          className={styles.checkbox}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelected([...selected, note._id]);
+                            } else {
+                              setSelected(
+                                selected.filter((id) => id !== note._id)
+                              );
+                            }
+                          }}
+                          checked={selected.includes(note._id)}
+                        />
+                      )}
+                    </CardActions>
+                  </div>
+                </Card>
+              ))
+            : null}
+        </div>
+      )}
     </Box>
   );
 };

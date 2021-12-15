@@ -4,6 +4,7 @@ import {
   CardActions,
   IconButton,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -12,7 +13,7 @@ import { Convert } from "mongo-image-converter";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/gallery/Gallery.module.css";
 import Compressor from "compressorjs";
-import { OpenInNew } from "@mui/icons-material";
+import { Delete, OpenInNew } from "@mui/icons-material";
 import Box from "../components/global/Box";
 import FileUpload from "../components/global/FileUpload";
 
@@ -50,8 +51,7 @@ const Gallery = ({ user }) => {
     }
   }, [currentUser]);
 
-  const fetchImages = () => {
-    setLoading(true);
+  const fetchImages = (cb) => {
     axios
       .get("/api/upload")
       .then(({ data: { data } }) => {
@@ -61,7 +61,7 @@ const Gallery = ({ user }) => {
         setError(err.message);
       })
       .finally(() => {
-        setLoading(false);
+        cb();
       });
   };
 
@@ -72,6 +72,18 @@ const Gallery = ({ user }) => {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const deleteImage = (id) => {
+    setLoading(true);
+    axios
+      .delete(`/api/upload/${id}`)
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        fetchImages(() => setLoading(false));
+      });
   };
 
   const handleSubmit = async (e) => {
@@ -97,8 +109,7 @@ const Gallery = ({ user }) => {
         setError(err.message);
       })
       .finally(() => {
-        setLoading(false);
-        fetchImages();
+        fetchImages(() => setLoading(false));
       });
   };
 
@@ -138,10 +149,13 @@ const Gallery = ({ user }) => {
       ) : (
         <section className="buffer-15"></section>
       )}
+      {loading && (
+        <div className="loading">
+          <CircularProgress />
+        </div>
+      )}
       <div className={styles.gallery}>
-        {loading ? (
-          <p>Loading...</p>
-        ) : (
+        {!loading &&
           imagesSortedByDate.map((image) => (
             <Card key={image._id}>
               <CardMedia
@@ -160,21 +174,29 @@ const Gallery = ({ user }) => {
                     {formatDate(image.uploadedAt)}
                   </Typography>
                 </div>
-                <IconButton
-                  onClick={() => {
-                    let imageToOpen = new Image();
-                    imageToOpen.src = image.image;
-                    let w = window.open("");
-                    w.document.write(imageToOpen.outerHTML);
-                  }}
-                  style={{ marginLeft: "auto" }}
-                >
-                  <OpenInNew />
-                </IconButton>
+                <div style={{ marginLeft: "auto" }}>
+                  {currentUser
+                    ? (currentUser.role === "admin" ||
+                        currentUser.role === "teacher") && (
+                        <IconButton onClick={() => deleteImage(image._id)}>
+                          <Delete />
+                        </IconButton>
+                      )
+                    : null}
+                  <IconButton
+                    onClick={() => {
+                      let imageToOpen = new Image();
+                      imageToOpen.src = image.image;
+                      let w = window.open("");
+                      w.document.write(imageToOpen.outerHTML);
+                    }}
+                  >
+                    <OpenInNew />
+                  </IconButton>
+                </div>
               </CardActions>
             </Card>
-          ))
-        )}
+          ))}
       </div>
     </div>
   );

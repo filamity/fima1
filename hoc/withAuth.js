@@ -2,9 +2,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import jwt from "jsonwebtoken";
 import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
 
 const withAuth = (WrappedComponent) => {
   const C = (props) => {
+    const { currentUser } = useAuth();
     const router = useRouter();
     const [user, setUser] = useState(null);
 
@@ -20,7 +22,7 @@ const withAuth = (WrappedComponent) => {
       } else {
         router.replace("/");
       }
-    }, []);
+    }, [router, currentUser]);
 
     if (user) {
       return <WrappedComponent user={user} {...props} />;

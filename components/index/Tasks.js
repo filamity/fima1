@@ -9,8 +9,8 @@ import {
   Card,
   FormGroup,
   TextField,
-  Chip,
   ButtonGroup,
+  CircularProgress,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import { useAuth } from "../../contexts/AuthContext";
@@ -19,14 +19,16 @@ import Box from "../global/Box";
 import axios from "axios";
 import { Add, Visibility, VisibilityOff } from "@mui/icons-material";
 
-const Tasks = ({ tasks, setTasks }) => {
+const Tasks = () => {
   const { currentUser } = useAuth();
+  const [tasks, setTasks] = useState([]);
   let tasksSortedByDate = tasks.sort((a, b) => {
     return new Date(a.dueAt) - new Date(b.dueAt);
   });
   let uncompletedTasks = tasksSortedByDate.filter(
     (task) => task.completed === false
   );
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showCompleted, setShowCompleted] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -37,12 +39,26 @@ const Tasks = ({ tasks, setTasks }) => {
   });
 
   useEffect(() => {
+    setLoading(true);
+    if (currentUser) {
+      axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
+        setTasks(data);
+        setLoading(false);
+      });
+    } else {
+      setTasks([]);
+      setLoading(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
     setError("");
   }, [task]);
 
-  const fetchTasks = () => {
+  const fetchTasks = (cb) => {
     axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
       setTasks(data);
+      cb();
     });
   };
 
@@ -54,6 +70,7 @@ const Tasks = ({ tasks, setTasks }) => {
 
   const createTask = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios
       .post(`/api/tasks/${currentUser._id}`, {
         title: task.title,
@@ -67,7 +84,7 @@ const Tasks = ({ tasks, setTasks }) => {
           description: "",
           dueAt: "",
         });
-        fetchTasks();
+        fetchTasks(() => setLoading(false));
       })
       .catch((err) => {
         setError(err.message);
@@ -163,62 +180,72 @@ const Tasks = ({ tasks, setTasks }) => {
         </Card>
       </Modal>
 
-      {!(showCompleted ? tasksSortedByDate : uncompletedTasks).length && (
-        <List sx={{ bgcolor: "background.paper" }}>
-          <ListItem>
-            <ListItemText primary="No Tasks to show" />
-          </ListItem>
-        </List>
+      {loading && (
+        <div className="loading" style={{ color: "white" }}>
+          <CircularProgress color="inherit" />
+        </div>
       )}
 
+      {!loading
+        ? !(showCompleted ? tasksSortedByDate : uncompletedTasks).length && (
+            <List sx={{ bgcolor: "background.paper" }}>
+              <ListItem>
+                <ListItemText primary="No Tasks to show" />
+              </ListItem>
+            </List>
+          )
+        : null}
+
       <List disablePadding>
-        {tasksSortedByDate.length
-          ? (showCompleted ? tasksSortedByDate : uncompletedTasks).map(
-              (task) => (
-                <ListItem
-                  key={task._id}
-                  sx={{ bgcolor: "background.paper" }}
-                  disablePadding
-                  secondaryAction={
-                    <Checkbox
-                      edge="end"
-                      onChange={(e) => {
-                        setTasks((prev) => {
-                          return prev.map((t) => {
-                            if (t._id === task._id) {
-                              t.completed = e.target.checked;
-                            }
-                            return t;
+        {!loading
+          ? tasksSortedByDate.length
+            ? (showCompleted ? tasksSortedByDate : uncompletedTasks).map(
+                (task) => (
+                  <ListItem
+                    key={task._id}
+                    sx={{ bgcolor: "background.paper" }}
+                    disablePadding
+                    secondaryAction={
+                      <Checkbox
+                        edge="end"
+                        onChange={(e) => {
+                          setTasks((prev) => {
+                            return prev.map((t) => {
+                              if (t._id === task._id) {
+                                t.completed = e.target.checked;
+                              }
+                              return t;
+                            });
                           });
-                        });
-                        updateTask(task._id, e.target.checked);
-                      }}
-                      checked={
-                        tasks.find((t) => t._id === task._id)?.completed ||
-                        false
-                      }
-                    />
-                  }
-                >
-                  <ListItemButton>
-                    <ListItemText
-                      primary={
-                        <>
-                          <span
-                            className="chip"
-                            data-status={taskStatus(task.dueAt).color}
-                          >
-                            {taskStatus(task.dueAt).name}
-                          </span>
-                          <span className="inlinebuffer-10"></span>
-                          {task.title}
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
+                          updateTask(task._id, e.target.checked);
+                        }}
+                        checked={
+                          tasks.find((t) => t._id === task._id)?.completed ||
+                          false
+                        }
+                      />
+                    }
+                  >
+                    <ListItemButton>
+                      <ListItemText
+                        primary={
+                          <>
+                            <span
+                              className="chip"
+                              data-status={taskStatus(task.dueAt).color}
+                            >
+                              {taskStatus(task.dueAt).name}
+                            </span>
+                            <span className="inlinebuffer-10"></span>
+                            {task.title}
+                          </>
+                        }
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                )
               )
-            )
+            : null
           : null}
       </List>
     </Box>
