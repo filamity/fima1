@@ -50,7 +50,7 @@ const FileUpload = ({ imageFile, handleDrop }) => {
             <div className={styles.dropzonetext}>
               Drag and drop onto here, or click to select file
             </div>
-            <div>Accepts only .png or .jpg under 16MB</div>
+            <div>Accepts only .png or .jpg images</div>
           </div>
         )}
       </div>

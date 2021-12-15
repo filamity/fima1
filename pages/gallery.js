@@ -9,13 +9,13 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 import withAuth from "../hoc/withAuth";
-import { Convert } from "mongo-image-converter";
 import { useAuth } from "../contexts/AuthContext";
 import styles from "../styles/gallery/Gallery.module.css";
 import Compressor from "compressorjs";
 import { Delete, OpenInNew } from "@mui/icons-material";
 import Box from "../components/global/Box";
 import FileUpload from "../components/global/FileUpload";
+import handleUpload from "../components/gallery/handleUpload";
 
 const Gallery = ({ user }) => {
   const { currentUser } = useAuth();
@@ -26,6 +26,7 @@ const Gallery = ({ user }) => {
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     setError("");
@@ -34,15 +35,7 @@ const Gallery = ({ user }) => {
   useEffect(() => {
     setLoading(true);
     if (currentUser) {
-      axios
-        .get("/api/upload")
-        .then(({ data: { data } }) => {
-          setImages(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err.message);
-        });
+      fetchImages(() => setLoading(false));
     } else {
       setImages([]);
       setLoading(false);
@@ -61,15 +54,6 @@ const Gallery = ({ user }) => {
       });
   };
 
-  const convertImage = async (file) => {
-    try {
-      const converted = await Convert(file);
-      return converted ? converted : null;
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   const deleteImage = (id) => {
     setLoading(true);
     axios
@@ -84,27 +68,20 @@ const Gallery = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const imageToUpload = await convertImage(imageFile);
-    if (!imageToUpload) {
-      setError("Image must be in image/jpg or image/png format");
-      return;
-    }
     setLoading(true);
-    axios
-      .post("/api/upload", {
-        image: imageToUpload,
-        user: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-      })
-      .then((res) => {
+    await handleUpload(
+      imageFile,
+      currentUser._id,
+      currentUser.firstName,
+      currentUser.lastName,
+      currentUser.username,
+      setError,
+      setProgress,
+      () => {
         setImageFile(null);
         fetchImages(() => setLoading(false));
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
+      }
+    );
   };
 
   const formatDate = (date) => {
@@ -155,7 +132,7 @@ const Gallery = ({ user }) => {
               <CardMedia
                 component="img"
                 height={300}
-                image={image.image}
+                image={image.url}
                 title={`${image.firstName} ${image.lastName}`}
                 alt={`${image.firstName} ${image.lastName}`}
               />
@@ -177,14 +154,7 @@ const Gallery = ({ user }) => {
                         </IconButton>
                       )
                     : null}
-                  <IconButton
-                    onClick={() => {
-                      let imageToOpen = new Image();
-                      imageToOpen.src = image.image;
-                      let w = window.open("");
-                      w.document.write(imageToOpen.outerHTML);
-                    }}
-                  >
+                  <IconButton onClick={() => window.open(image.url, "_blank")}>
                     <OpenInNew />
                   </IconButton>
                 </div>

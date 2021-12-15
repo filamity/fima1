@@ -171,7 +171,7 @@ const Notes = () => {
         }}
       >
         <Card className={styles.card}>
-          <div className="title">{editing ? "Editing" : "New"} Note</div>
+          <div className="title">{editing ? "Edit" : "New"} Note</div>
           <section className="buffer-20"></section>
           <form onSubmit={editing ? updateNote : createNote}>
             <FormGroup>
