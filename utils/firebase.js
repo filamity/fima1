@@ -12,8 +12,6 @@ var firebaseApp = firebase.initializeApp({
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 });
 
-console.log(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET);
-
 const firestore = firebase.firestore();
 const firestorage = firebase.storage();
 const timestamp = firebase.firestore.FieldValue.serverTimestamp;
