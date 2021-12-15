@@ -38,12 +38,10 @@ const Gallery = ({ user }) => {
         .get("/api/upload")
         .then(({ data: { data } }) => {
           setImages(data);
+          setLoading(false);
         })
         .catch((err) => {
           setError(err.message);
-        })
-        .finally(() => {
-          setLoading(false);
         });
     } else {
       setImages([]);
@@ -56,12 +54,10 @@ const Gallery = ({ user }) => {
       .get("/api/upload")
       .then(({ data: { data } }) => {
         setImages(data);
+        cb();
       })
       .catch((err) => {
         setError(err.message);
-      })
-      .finally(() => {
-        cb();
       });
   };
 
@@ -78,11 +74,11 @@ const Gallery = ({ user }) => {
     setLoading(true);
     axios
       .delete(`/api/upload/${id}`)
+      .then(() => {
+        fetchImages(() => setLoading(false));
+      })
       .catch((err) => {
         setError(err.message);
-      })
-      .finally(() => {
-        fetchImages(() => setLoading(false));
       });
   };
 
@@ -104,12 +100,10 @@ const Gallery = ({ user }) => {
       })
       .then((res) => {
         setImageFile(null);
+        fetchImages(() => setLoading(false));
       })
       .catch((err) => {
         setError(err.message);
-      })
-      .finally(() => {
-        fetchImages(() => setLoading(false));
       });
   };
 
