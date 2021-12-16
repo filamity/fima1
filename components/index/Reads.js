@@ -101,7 +101,6 @@ const Reads = () => {
     const { name, value } = event.target;
     setRead((prev) => ({ ...prev, [name]: value }));
   };
-
   return (
     <Box title="Reads" className={styles.reads}>
       {(currentUser.role === "admin" || currentUser.role === "teacher") && (
