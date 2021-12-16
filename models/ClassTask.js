@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const TaskSchema = new mongoose.Schema({
+const ClassTaskSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, "Title is required"],
@@ -20,18 +20,19 @@ const TaskSchema = new mongoose.Schema({
     type: Date,
     required: [true, "Due date is required"],
   },
-  completed: {
-    type: Boolean,
-    default: false,
-  },
-  classTask: {
-    type: Schema.Types.ObjectId,
-    ref: "ClassTask",
-  },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
+  completeStatus: [
+    {
+      student: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      },
+      completed: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  ],
 });
 
-module.exports = mongoose.models.Task || mongoose.model("Task", TaskSchema);
+module.exports =
+  mongoose.models.ClassTask || mongoose.model("ClassTask", ClassTaskSchema);

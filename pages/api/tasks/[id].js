@@ -1,6 +1,7 @@
 import dbConnect from "../../../utils/dbConnect";
 import Task from "../../../models/Task";
 import User from "../../../models/User";
+import ClassTask from "../../../models/ClassTask";
 
 dbConnect();
 
@@ -41,9 +42,10 @@ export default async function (req, res) {
       break;
     case "PUT":
       try {
+        const { student, completed } = req.body;
         const task = await Task.findByIdAndUpdate(
           id,
-          { ...req.body },
+          { completed: completed },
           { new: true, runValidators: true }
         );
         if (!task) {
@@ -51,6 +53,13 @@ export default async function (req, res) {
             .status(400)
             .json({ success: false, message: "No task found" });
         }
+        ClassTask.findOne({ _id: task.classTask }).then((classTask) => {
+          let item = classTask.completeStatus.find(
+            (obj) => obj.student.toString() === student
+          );
+          item.completed = completed;
+          classTask.save();
+        });
         res.status(200).json({ success: true, data: task });
       } catch (error) {
         res.status(400).json({ success: false, message: error.message });

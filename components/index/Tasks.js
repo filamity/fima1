@@ -21,11 +21,16 @@ import { Add, Visibility, VisibilityOff } from "@mui/icons-material";
 
 const Tasks = () => {
   const { currentUser } = useAuth();
+  const isTeacher = currentUser.role === "teacher";
   const [tasks, setTasks] = useState([]);
-  let tasksSortedByDate = tasks.sort((a, b) => {
+  tasks.sort((a, b) => {
     return new Date(a.dueAt) - new Date(b.dueAt);
   });
-  let uncompletedTasks = tasksSortedByDate.filter(
+  const [classTasks, setClassTasks] = useState([]);
+  classTasks.sort((a, b) => {
+    return new Date(a.dueAt) - new Date(b.dueAt);
+  });
+  let uncompletedTasks = tasks.filter(
     (task) => task.completed === false
   );
   const [loading, setLoading] = useState(false);
@@ -39,21 +44,28 @@ const Tasks = () => {
   });
 
   useEffect(() => {
+    setError("");
+  }, [task]);
+
+  useEffect(() => {
     setLoading(true);
     if (currentUser) {
-      axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
-        setTasks(data);
-        setLoading(false);
-      });
+      currentUser.role === "teacher"
+        ? fetchClassTasks(() => setLoading(false))
+        : fetchTasks(() => setLoading(false));
     } else {
       setTasks([]);
+      setClassTasks([]);
       setLoading(false);
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    setError("");
-  }, [task]);
+  const fetchClassTasks = (cb) => {
+    axios.get(`/api/tasks`).then(({ data: { data } }) => {
+      setClassTasks(data);
+      cb();
+    });
+  };
 
   const fetchTasks = (cb) => {
     axios.get(`/api/tasks/${currentUser._id}`).then(({ data: { data } }) => {
@@ -64,6 +76,7 @@ const Tasks = () => {
 
   const updateTask = (taskId, completed) => {
     axios.put(`/api/tasks/${taskId}`, {
+      student: currentUser._id,
       completed: completed,
     });
   };
@@ -72,7 +85,7 @@ const Tasks = () => {
     e.preventDefault();
     setLoading(true);
     axios
-      .post(`/api/tasks/${currentUser._id}`, {
+      .post(isTeacher ? `/api/tasks` : `/api/tasks/${currentUser._id}`, {
         title: task.title,
         description: task.description,
         dueAt: task.dueAt,
@@ -84,7 +97,9 @@ const Tasks = () => {
           description: "",
           dueAt: "",
         });
-        fetchTasks(() => setLoading(false));
+        isTeacher
+          ? fetchClassTasks(() => setLoading(false))
+          : fetchTasks(() => setLoading(false));
       })
       .catch((err) => {
         setError(err.message);
@@ -106,7 +121,6 @@ const Tasks = () => {
   const taskStatus = (date) => {
     const d = new Date(date);
     const today = new Date();
-
     if (
       d.getDate() === today.getDate() &&
       d.getMonth() === today.getMonth() &&
@@ -138,7 +152,9 @@ const Tasks = () => {
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Card className={styles.card}>
-          <div className="title">New Task</div>
+          <div className="title">
+            {isTeacher ? "New Class Task" : "New Personal Task"}
+          </div>
           <section className="buffer-20"></section>
           <form onSubmit={createTask}>
             <FormGroup>
@@ -187,19 +203,62 @@ const Tasks = () => {
       )}
 
       {!loading
-        ? !(showCompleted ? tasksSortedByDate : uncompletedTasks).length && (
-            <List sx={{ bgcolor: "background.paper" }}>
-              <ListItem>
-                <ListItemText primary="No Tasks to show" />
-              </ListItem>
-            </List>
-          )
+        ? isTeacher
+          ? !classTasks.length && (
+              <List sx={{ bgcolor: "background.paper" }}>
+                <ListItem>
+                  <ListItemText primary="No Tasks to show" />
+                </ListItem>
+              </List>
+            )
+          : !(showCompleted ? tasks : uncompletedTasks).length && (
+              <List sx={{ bgcolor: "background.paper" }}>
+                <ListItem>
+                  <ListItemText primary="No Tasks to show" />
+                </ListItem>
+              </List>
+            )
         : null}
 
       <List disablePadding>
         {!loading
-          ? tasksSortedByDate.length
-            ? (showCompleted ? tasksSortedByDate : uncompletedTasks).map(
+          ? isTeacher
+            ? classTasks.map((task) => (
+                <ListItem
+                  key={task._id}
+                  sx={{ bgcolor: "background.paper" }}
+                  disablePadding
+                  secondaryAction={
+                    <b>
+                      {
+                        task.completeStatus.filter(
+                          (student) => student.completed === true
+                        ).length
+                      }
+                      /{task.completeStatus.length}
+                    </b>
+                  }
+                >
+                  <ListItemButton>
+                    <ListItemText
+                      primary={
+                        <>
+                          <span
+                            className="chip"
+                            data-status={taskStatus(task.dueAt).color}
+                          >
+                            {taskStatus(task.dueAt).name}
+                          </span>
+                          <span className="inlinebuffer-10"></span>
+                          {task.title}
+                        </>
+                      }
+                    />
+                  </ListItemButton>
+                </ListItem>
+              ))
+            : tasks.length
+            ? (showCompleted ? tasks : uncompletedTasks).map(
                 (task) => (
                   <ListItem
                     key={task._id}

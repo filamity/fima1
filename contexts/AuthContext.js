@@ -60,7 +60,7 @@ const AuthProvider = ({ children }) => {
     } catch (error) {
       return error;
     }
-  }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");

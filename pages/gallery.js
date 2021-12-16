@@ -21,9 +21,7 @@ const Gallery = ({ user }) => {
   const { currentUser } = useAuth();
   const [imageFile, setImageFile] = useState(null);
   const [images, setImages] = useState([]);
-  const imagesSortedByDate = images.sort(
-    (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
-  );
+  images.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -127,7 +125,7 @@ const Gallery = ({ user }) => {
       )}
       <div className={styles.gallery}>
         {!loading &&
-          imagesSortedByDate.map((image) => (
+          images.map((image) => (
             <Card key={image._id}>
               <CardMedia
                 component="img"

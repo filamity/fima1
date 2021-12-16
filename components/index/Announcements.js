@@ -25,9 +25,7 @@ import { useAuth } from "../../contexts/AuthContext";
 const Announcements = () => {
   const { currentUser } = useAuth();
   const [announcements, setAnnouncements] = useState([]);
-  let announcementsSortedByDate = announcements.sort(
-    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-  );
+  announcements.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -180,7 +178,7 @@ const Announcements = () => {
       )}
 
       {!loading
-        ? !announcementsSortedByDate.length && (
+        ? !announcements.length && (
             <List sx={{ bgcolor: "background.paper" }}>
               <ListItem>
                 <ListItemText primary="No Announcements" />
@@ -190,8 +188,8 @@ const Announcements = () => {
         : null}
 
       {!loading
-        ? announcementsSortedByDate.length
-          ? announcementsSortedByDate.map((announcement) => (
+        ? announcements.length
+          ? announcements.map((announcement) => (
               <Accordion
                 key={announcement._id}
                 expanded={expanded === announcement._id}
