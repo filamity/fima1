@@ -1,0 +1,19 @@
+.card {
+  padding: 20px;
+}
+
+.textbody {
+  font-size: 1.1rem;
+}
+
+.editcard {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 500px;
+  width: calc(100% - 2rem);
+  outline: none;
+  padding: 20px;
+  text-align: center;
+}

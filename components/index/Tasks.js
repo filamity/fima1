@@ -18,6 +18,7 @@ import styles from "../../styles/index/Tasks.module.css";
 import Box from "../global/Box";
 import axios from "axios";
 import { Add, Visibility, VisibilityOff } from "@mui/icons-material";
+import Link from "next/link";
 
 const Tasks = () => {
   const { currentUser } = useAuth();
@@ -30,9 +31,7 @@ const Tasks = () => {
   classTasks.sort((a, b) => {
     return new Date(a.dueAt) - new Date(b.dueAt);
   });
-  let uncompletedTasks = tasks.filter(
-    (task) => task.completed === false
-  );
+  let uncompletedTasks = tasks.filter((task) => task.completed === false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showCompleted, setShowCompleted] = useState(false);
@@ -224,65 +223,20 @@ const Tasks = () => {
         {!loading
           ? isTeacher
             ? classTasks.map((task) => (
-                <ListItem
-                  key={task._id}
-                  sx={{ bgcolor: "background.paper" }}
-                  disablePadding
-                  secondaryAction={
-                    <b>
-                      {
-                        task.completeStatus.filter(
-                          (student) => student.completed === true
-                        ).length
-                      }
-                      /{task.completeStatus.length}
-                    </b>
-                  }
-                >
-                  <ListItemButton>
-                    <ListItemText
-                      primary={
-                        <>
-                          <span
-                            className="chip"
-                            data-status={taskStatus(task.dueAt).color}
-                          >
-                            {taskStatus(task.dueAt).name}
-                          </span>
-                          <span className="inlinebuffer-10"></span>
-                          {task.title}
-                        </>
-                      }
-                    />
-                  </ListItemButton>
-                </ListItem>
-              ))
-            : tasks.length
-            ? (showCompleted ? tasks : uncompletedTasks).map(
-                (task) => (
+                <Link key={task._id} href={`/task/${task._id}`} passHref>
                   <ListItem
                     key={task._id}
                     sx={{ bgcolor: "background.paper" }}
                     disablePadding
                     secondaryAction={
-                      <Checkbox
-                        edge="end"
-                        onChange={(e) => {
-                          setTasks((prev) => {
-                            return prev.map((t) => {
-                              if (t._id === task._id) {
-                                t.completed = e.target.checked;
-                              }
-                              return t;
-                            });
-                          });
-                          updateTask(task._id, e.target.checked);
-                        }}
-                        checked={
-                          tasks.find((t) => t._id === task._id)?.completed ||
-                          false
+                      <b>
+                        {
+                          task.completeStatus.filter(
+                            (student) => student.completed === true
+                          ).length
                         }
-                      />
+                        /{task.completeStatus.length}
+                      </b>
                     }
                   >
                     <ListItemButton>
@@ -302,8 +256,55 @@ const Tasks = () => {
                       />
                     </ListItemButton>
                   </ListItem>
-                )
-              )
+                </Link>
+              ))
+            : tasks.length
+            ? (showCompleted ? tasks : uncompletedTasks).map((task) => (
+                <ListItem
+                  key={task._id}
+                  sx={{ bgcolor: "background.paper" }}
+                  disablePadding
+                  secondaryAction={
+                    <Checkbox
+                      edge="end"
+                      onChange={(e) => {
+                        setTasks((prev) => {
+                          return prev.map((t) => {
+                            if (t._id === task._id) {
+                              t.completed = e.target.checked;
+                            }
+                            return t;
+                          });
+                        });
+                        updateTask(task._id, e.target.checked);
+                      }}
+                      checked={
+                        tasks.find((t) => t._id === task._id)?.completed ||
+                        false
+                      }
+                    />
+                  }
+                >
+                  <ListItemButton>
+                    <Link key={task._id} href={`/task/${task._id}`} passHref>
+                      <ListItemText
+                        primary={
+                          <>
+                            <span
+                              className="chip"
+                              data-status={taskStatus(task.dueAt).color}
+                            >
+                              {taskStatus(task.dueAt).name}
+                            </span>
+                            <span className="inlinebuffer-10"></span>
+                            {task.title}
+                          </>
+                        }
+                      />
+                    </Link>
+                  </ListItemButton>
+                </ListItem>
+              ))
             : null
           : null}
       </List>

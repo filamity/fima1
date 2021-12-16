@@ -8,6 +8,8 @@ dbConnect();
 export default async function (req, res) {
   const { method } = req;
   switch (method) {
+    // Teacher GET /api/tasks
+    // Fetches all tasks from class tasks (not from global tasks)
     case "GET":
       try {
         const classTasks = await ClassTask.find({});
@@ -16,6 +18,11 @@ export default async function (req, res) {
         res.status(400).json({ success: false, error: error.message });
       }
       break;
+    // Teacher POST /api/tasks
+    // Creates a new task for the class with initial completion status (all false at first)
+    // Then for each student:
+      // Creates the respective task in the global Tasks bucket
+      // Then adds the task to their personal tasks bucket
     case "POST":
       try {
         const students = await User.find({ role: "student" });

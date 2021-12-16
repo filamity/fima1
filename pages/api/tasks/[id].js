@@ -12,6 +12,8 @@ export default async function (req, res) {
   } = req;
 
   switch (method) {
+    // Student GET /api/task/:taskId
+    // Fetches tasks with matching ID from global tasks bucket
     case "GET":
       try {
         const tasks = await Task.find({ user: id });
@@ -20,15 +22,11 @@ export default async function (req, res) {
         res.status(400).json({ success: false, error: error.message });
       }
       break;
+    // Student POST /api/task/:taskId
+    // Creates a new personal task for the student
+    // Then adds the task to the student's task bucket
     case "POST":
       try {
-        const user = await User.findById(id);
-        if (!user) {
-          return res.status(404).json({
-            success: false,
-            message: "User not found",
-          });
-        }
         const task = await Task.create({ ...req.body, user: id });
         await User.findByIdAndUpdate(
           id,
@@ -40,6 +38,9 @@ export default async function (req, res) {
         res.status(400).json({ success: false, error: error.message });
       }
       break;
+    // Student PUT /api/task/:taskId
+    // Only updates task completion
+    // Takes in student ID so completion status in classTasks can be updated
     case "PUT":
       try {
         const { student, completed } = req.body;
@@ -54,6 +55,7 @@ export default async function (req, res) {
             .json({ success: false, message: "No task found" });
         }
         ClassTask.findOne({ _id: task.classTask }).then((classTask) => {
+          if (!classTask) return;
           let item = classTask.completeStatus.find(
             (obj) => obj.student.toString() === student
           );
@@ -65,6 +67,9 @@ export default async function (req, res) {
         res.status(400).json({ success: false, message: error.message });
       }
       break;
+    // Student DELETE /api/task/:taskId
+    // Only deletes personal tasks
+    // Then removes task from students' task list
     case "DELETE":
       try {
         const task = await Task.findByIdAndDelete(id);
