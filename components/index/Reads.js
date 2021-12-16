@@ -101,7 +101,7 @@ const Reads = () => {
     const { name, value } = event.target;
     setRead((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   return (
     <Box title="Reads" className={styles.reads}>
       {(currentUser.role === "admin" || currentUser.role === "teacher") && (
@@ -111,11 +111,11 @@ const Reads = () => {
               <Add />
             </Button>
             <Button
+              color="primary"
               onClick={() => {
                 if (selecting) setSelected([]);
                 setSelecting((prev) => !prev);
               }}
-              color="primary"
             >
               {selecting ? <DoDisturb /> : <Delete />}
             </Button>
