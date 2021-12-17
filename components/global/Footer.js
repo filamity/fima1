@@ -1,21 +1,18 @@
 import styles from "../../styles/global/Footer.module.css";
-import GitHubIcon from '@mui/icons-material/GitHub';
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
+import Box from "@mui/material/Box";
+import { GitHub } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+import Link from "next/link";
 
 const Footer = () => {
   return (
     <div className={`${styles.footerwrap} shadow`}>
-      <Box sx={{ pb: 2 }}>
-        FI-MA1
-      </Box>
-      <Box>
-        <GitHubIcon onClick={() => {
-    window.open("https://github.com/filamity/fima1");
-  }} fontSize="large" className={styles.github} />
-      </Box>
-      
-    
+      <Box>FI-MA1</Box>
+      <Link href="https://github.com/filamity/fima1" passHref>
+        <IconButton component="a" color="inherit">
+          <GitHub fontSize="large" className={styles.github} />
+        </IconButton>
+      </Link>
     </div>
   );
 };
