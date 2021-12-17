@@ -227,14 +227,23 @@ const Notes = () => {
           {notes.length
             ? notes.map((note) => (
                 <Card key={note._id} className={styles.notecard}>
-                  <CardContent>
+                  <CardContent
+                    sx={{
+                      opacity: selecting ? 0.3 : 1,
+                    }}
+                  >
                     <Typography variant="h5" component="div">
                       {note.title}
                     </Typography>
                     <Typography variant="body2">{note.description}</Typography>
                   </CardContent>
                   <section style={{ height: "56px" }}></section>
-                  <div className={styles.notecardactions}>
+                  <div
+                    style={{
+                      opacity: selecting ? 0.3 : 1,
+                    }}
+                    className={styles.notecardactions}
+                  >
                     <Divider />
                     <CardActions>
                       <IconButton
@@ -243,23 +252,27 @@ const Notes = () => {
                       >
                         <Edit />
                       </IconButton>
-                      {selecting && (
-                        <Checkbox
-                          className={styles.checkbox}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelected([...selected, note._id]);
-                            } else {
-                              setSelected(
-                                selected.filter((id) => id !== note._id)
-                              );
-                            }
-                          }}
-                          checked={selected.includes(note._id)}
-                        />
-                      )}
                     </CardActions>
                   </div>
+                  {selecting && (
+                    <Checkbox
+                      checked={selected.includes(note._id)}
+                      color="error"
+                      sx={{
+                        position: "absolute",
+                        left: "50%",
+                        top: "50%",
+                        transform: "translate(-50%, -50%) scale(1.2)",
+                      }}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelected([...selected, note._id]);
+                        } else {
+                          setSelected(selected.filter((id) => id !== note._id));
+                        }
+                      }}
+                    />
+                  )}
                 </Card>
               ))
             : null}

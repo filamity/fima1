@@ -1,15 +1,19 @@
 .reads {
   grid-row: span 2;
+  max-height: 650px;
+  overflow-y: scroll;
 }
 
 @media screen and (max-width: 900px) {
   .reads {
     grid-row: span 1;
+    max-height: 500px;
   }
 }
 @media screen and (max-width: 600px) {
   .reads {
     grid-row: span 1;
+    max-height: 500px;
   }
 }
 

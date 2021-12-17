@@ -178,7 +178,11 @@ const Reads = () => {
       )}
 
       {!loading && (
-        <List sx={{ bgcolor: "background.paper" }}>
+        <List
+          sx={{
+            background: "white",
+          }}
+        >
           {!reads.length && (
             <ListItem alignItems="flex-start">
               <ListItemText primary="No Reads" />
@@ -186,31 +190,35 @@ const Reads = () => {
           )}
           {reads.length
             ? reads.map((read) => (
-                <ListItem
-                  key={read._id}
-                  alignItems="flex-start"
-                  secondaryAction={
-                    selecting ? (
-                      <Checkbox
-                        edge="end"
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelected((prev) => [...prev, read._id]);
-                          } else {
-                            setSelected((prev) =>
-                              prev.filter((id) => id !== read._id)
-                            );
-                          }
-                        }}
-                        checked={selected.includes(read._id)}
-                      />
-                    ) : null
-                  }
-                >
+                <ListItem key={read._id} alignItems="flex-start">
                   <ListItemText
+                    sx={{
+                      opacity: selecting ? 0.3 : 1,
+                    }}
                     primary={<Link href={read.link}>{read.title}</Link>}
                     secondary={read.description}
                   />
+                  {selecting ? (
+                    <Checkbox
+                      color="error"
+                      sx={{
+                        position: "absolute",
+                        left: "50%",
+                        top: "50%",
+                        transform: "translate(-50%, -50%) scale(1.2)",
+                      }}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelected((prev) => [...prev, read._id]);
+                        } else {
+                          setSelected((prev) =>
+                            prev.filter((id) => id !== read._id)
+                          );
+                        }
+                      }}
+                      checked={selected.includes(read._id)}
+                    />
+                  ) : null}
                 </ListItem>
               ))
             : null}

@@ -1,15 +1,19 @@
 .announcements {
   grid-column: span 2;
+  max-height: 317.5px;
+  overflow-y: scroll;
 }
 
 @media screen and (max-width: 900px) {
   .announcements {
     grid-column: 1 / -1;
+    max-height: 500px;
   }
 }
 @media screen and (max-width: 600px) {
   .announcements {
     grid-column: 1 / -1;
+    max-height: 500px;
   }
 }
 

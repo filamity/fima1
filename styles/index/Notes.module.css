@@ -1,5 +1,7 @@
 .notes {
   grid-column: 1/ -1;
+  max-height: 500px;
+  overflow-y: scroll;
 }
 
 .card {
@@ -12,10 +14,6 @@
   outline: none;
   padding: 20px;
   text-align: center;
-}
-
-.checkbox {
-  margin-left: auto;
 }
 
 .notegrid {

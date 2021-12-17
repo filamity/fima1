@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import Box from "../../components/global/Box";
 import { Close, Delete, Done, Edit } from "@mui/icons-material";
+import withAuth from "../../hoc/withAuth";
 
 const filterTableData = (input, tableData) => {
   const filteredData = tableData.filter((student) => {
@@ -414,4 +415,4 @@ const Task = () => {
   );
 };
 
-export default Task;
+export default withAuth(Task);

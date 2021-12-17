@@ -1,5 +1,7 @@
 .links {
   grid-column: 1 / -1;
+  max-height: 500px;
+  overflow-y: scroll;
 }
 
 .linksgrid {

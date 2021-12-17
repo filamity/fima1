@@ -1,15 +1,19 @@
 .tasks {
   grid-column: span 2;
+  max-height: 317.5px;
+  overflow-y: scroll;
 }
 
 @media screen and (max-width: 900px) {
   .tasks {
     grid-column: span 1;
+    max-height: 500px;
   }
 }
 @media screen and (max-width: 600px) {
   .tasks {
     grid-column: span 1;
+    max-height: 500px;
   }
 }
 

@@ -196,7 +196,7 @@ const Announcements = () => {
                 onChange={handleAccordion(announcement._id)}
               >
                 <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography>
+                  <Typography sx={{ opacity: selecting ? 0.3 : 1 }}>
                     <span className="chip">
                       {formatDate(announcement.createdAt)}
                     </span>
@@ -205,11 +205,12 @@ const Announcements = () => {
                   </Typography>
                   {selecting ? (
                     <Checkbox
-                      edge="end"
+                      color="error"
                       sx={{
                         position: "absolute",
-                        right: "50px",
-                        top: "3px",
+                        left: "50%",
+                        top: "50%",
+                        transform: "translate(-50%, -50%) scale(1.2)",
                       }}
                       onChange={(e) => {
                         if (e.target.checked) {
@@ -224,7 +225,7 @@ const Announcements = () => {
                     />
                   ) : null}
                 </AccordionSummary>
-                <AccordionDetails>
+                <AccordionDetails sx={{ opacity: selecting ? 0.3 : 1 }}>
                   <Typography>{announcement.description}</Typography>
                 </AccordionDetails>
               </Accordion>
