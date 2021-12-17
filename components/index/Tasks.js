@@ -139,12 +139,14 @@ const Tasks = () => {
         <Button onClick={() => setModalOpen(true)} variant="contained">
           <Add />
         </Button>
-        <Button
-          onClick={() => setShowCompleted((prev) => !prev)}
-          variant="contained"
-        >
-          {showCompleted ? <VisibilityOff /> : <Visibility />}
-        </Button>
+        {!isTeacher && (
+          <Button
+            onClick={() => setShowCompleted((prev) => !prev)}
+            variant="contained"
+          >
+            {showCompleted ? <VisibilityOff /> : <Visibility />}
+          </Button>
+        )}
       </ButtonGroup>
 
       <section className="buffer-10"></section>

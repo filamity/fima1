@@ -16,7 +16,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import { Collections, Home, Logout } from "@mui/icons-material";
+import { Collections, Home, Logout, PrivacyTip } from "@mui/icons-material";
 import Link from "next/link";
 
 import styles from "../../styles/global/Navbar.module.css";
@@ -49,6 +49,17 @@ const Navbar = () => {
             <ListItemText primary="Gallery" />
           </ListItem>
         </Link>
+        <Link
+          href="/static/privacy/FIMA1 Website Privacy Policy (v1.2).pdf"
+          passHref
+        >
+          <ListItem button component="a" target="_blank">
+            <ListItemIcon>
+              <PrivacyTip />
+            </ListItemIcon>
+            <ListItemText primary="Privacy Policy" />
+          </ListItem>
+        </Link>
       </List>
     </Box>
   );
@@ -67,9 +78,22 @@ const Navbar = () => {
           </IconButton>
           <span className="inlinebuffer-10"></span>
           <Typography variant="h6" component="div" className={styles.link}>
-            <Link href="/">FI-MA1</Link>
+            <Link href="/">FI-MA1 (v1.2)</Link>
           </Typography>
           <div className={styles.accountbutton}>
+            <Link
+              href="/static/privacy/FIMA1 Website Privacy Policy (v1.2).pdf"
+              passHref
+            >
+              <IconButton
+                component="a"
+                target="_blank"
+                size="large"
+                color="inherit"
+              >
+                <PrivacyTip />
+              </IconButton>
+            </Link>
             <IconButton
               size="large"
               onClick={(e) => setAnchorEl(e.currentTarget)}

@@ -9,11 +9,29 @@ import {
   CircularProgress,
   FormGroup,
   Modal,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import Box from "../../components/global/Box";
-import { Delete, Done, Edit } from "@mui/icons-material";
+import { Close, Delete, Done, Edit } from "@mui/icons-material";
+
+const filterTableData = (input, tableData) => {
+  const filteredData = tableData.filter((student) => {
+    let fullName = `${student.firstName.toLowerCase()} ${student.lastName.toLowerCase()}`;
+    return (
+      fullName.includes(input.toLowerCase()) ||
+      student.firstName.toLowerCase().includes(input.toLowerCase()) ||
+      student.lastName.toLowerCase().includes(input.toLowerCase()) ||
+      student.username.toLowerCase().includes(input.toLowerCase())
+    );
+  });
+  return filteredData;
+};
 
 const Task = () => {
   const { currentUser } = useAuth();
@@ -24,11 +42,14 @@ const Task = () => {
   const router = useRouter();
   const { taskId } = router.query;
   const [modalOpen, setModalOpen] = useState(false);
+  const [tableData, setTableData] = useState([]);
+  const [filter, setFilter] = useState("");
   const [editTask, setEditTask] = useState({
     title: "",
     description: "",
     dueAt: "",
   });
+  tableData = filterTableData(filter, tableData);
 
   const fetchTask = (id, cb) => {
     if (isTeacher === true) {
@@ -148,6 +169,32 @@ const Task = () => {
     }`;
   };
 
+  useEffect(() => {
+    if (currentUser) {
+      axios
+        .get("/api/user", {
+          params: {
+            role: "student",
+          },
+        })
+        .then(({ data: { data } }) => {
+          const formattedData = [];
+          data.forEach((student) => {
+            formattedData.push({
+              id: student._id,
+              firstName: student.firstName,
+              lastName: student.lastName,
+              username: student.username,
+            });
+          });
+          setTableData(formattedData);
+        })
+        .catch((err) => {
+          setError(err.message);
+        });
+    }
+  }, [currentUser]);
+
   return (
     <div className="container">
       <h1>Task</h1>
@@ -214,7 +261,7 @@ const Task = () => {
           <Card className={styles.card}>
             {!isTeacher && (
               <Button
-                variant="contained"
+                variant={task.completed ? "outlined" : "contained"}
                 startIcon={<Done />}
                 onClick={() => {
                   updateTask(task._id, { completed: !task.completed });
@@ -281,6 +328,86 @@ const Task = () => {
               {task.description}
             </Typography>
           </Card>
+          <section className="buffer-15"></section>
+          {isTeacher && (
+            <Card className={styles.card}>
+              <Typography color="text.secondary" component="div">
+                Finished (
+                {
+                  task.completeStatus.filter(
+                    (student) => student.completed === true
+                  ).length
+                }
+                /{task.completeStatus.length}
+                ):
+              </Typography>
+              <section className="buffer-15"></section>
+              <div className={styles.filterinput}>
+                <TextField
+                  label="Type to Filter..."
+                  variant="standard"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                />
+              </div>
+              <section className="buffer-15"></section>
+              {tableData.length ? (
+                <Table sx={{ width: "100%" }} size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell className={styles.tablehead}>Name</TableCell>
+                      <TableCell className={styles.tablehead} align="right">
+                        Finished
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {task.completeStatus.map((student) => {
+                      let studentData = tableData.find(
+                        (user) => user.id === student.student
+                      );
+                      if (!studentData) return null;
+                      let { firstName, lastName, username } = studentData;
+                      return (
+                        <TableRow key={student._id}>
+                          <TableCell className={styles.tabletext}>
+                            {firstName} {lastName}
+                            <Typography
+                              color="text.secondary"
+                              className={styles.tableusername}
+                            >
+                              {username}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="right">
+                            {student.completed ? (
+                              <Done
+                                color="success"
+                                style={{ verticalAlign: "middle" }}
+                              />
+                            ) : (
+                              <Close
+                                color="error"
+                                style={{ verticalAlign: "middle" }}
+                              />
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              ) : loading ? (
+                <div className={styles.progress}>
+                  <CircularProgress />
+                </div>
+              ) : (
+                <div className={styles.progress}>
+                  <Typography>No students</Typography>
+                </div>
+              )}
+            </Card>
+          )}
         </Box>
       )}
     </div>

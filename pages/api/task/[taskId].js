@@ -1,6 +1,7 @@
 import dbConnect from "../../../utils/dbConnect";
 import Task from "../../../models/Task";
 import ClassTask from "../../../models/ClassTask";
+import User from "../../../models/User";
 
 dbConnect();
 
@@ -57,6 +58,7 @@ export default async function (req, res) {
       break;
     // Student DELETE /api/task/:taskId
     // This only deletes personal tasks
+    // Then removes task from the student's own task list
     case "DELETE":
       try {
         const task = await Task.findByIdAndDelete(taskId);
@@ -66,6 +68,10 @@ export default async function (req, res) {
             message: "Task not found",
           });
         }
+        User.findOne({ _id: task.user }).then((user) => {
+          user.tasks = user.tasks.filter((task) => task.toString() !== taskId);
+          user.save();
+        });
         res.status(200).json({ success: true });
       } catch (error) {
         res.status(400).json({ success: false, error: error.message });

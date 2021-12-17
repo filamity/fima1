@@ -14,16 +14,19 @@ const Links = () => {
       name: "Gallery",
       url: "/gallery",
       image: "/static/images/gallery.jpg",
+      description: "A shared collection of photos uploaded by members of FI-MA1, and some of our own. Post some flowers!",
     },
     {
       name: "Desmos",
       url: "https://www.desmos.com/calculator",
       image: "/static/images/desmos.png",
+      description: "My best friend, who surely needs no introduction. A calculator that can do not only math, but also... mostly math.",
     },
     {
       name: "Firefly",
       url: "https://harrowschool.fireflycloud.net/boys-dashboard",
       image: "/static/images/firefly.png",
+      description: "Basically this website, but with around 3 more features and a bit more reddish. Go check what's for dinner!",
     },
   ];
 
@@ -47,8 +50,7 @@ const Links = () => {
                   {tool.name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Lizards are a widespread group of squamate reptiles, with over
-                  6,000 species, ranging across all continents except Antarctica
+                  {tool.description}
                 </Typography>
               </CardContent>
             </CardActionArea>
