@@ -1,31 +1,20 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import jwt from "jsonwebtoken";
-import axios from "axios";
+import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 const withAuth = (WrappedComponent) => {
   const C = (props) => {
     const { currentUser } = useAuth();
     const router = useRouter();
-    const [user, setUser] = useState(null);
-
-    //TODO: redirect to login page if logout
 
     useEffect(() => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        const { userId } = jwt.verify(token, process.env.JWT_SECRET);
-        axios.get(`/api/user/${userId}`).then((res) => {
-          setUser(res.data.data);
-        });
-      } else {
+      if (!currentUser) {
         router.replace("/");
       }
     }, [router, currentUser]);
 
-    if (user) {
-      return <WrappedComponent user={user} {...props} />;
+    if (currentUser) {
+      return <WrappedComponent {...props} />;
     } else {
       return null;
     }

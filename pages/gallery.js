@@ -17,7 +17,7 @@ import Box from "../components/global/Box";
 import FileUpload from "../components/global/FileUpload";
 import handleUpload from "../components/gallery/handleUpload";
 
-const Gallery = ({ user }) => {
+const Gallery = () => {
   const { currentUser } = useAuth();
   const [imageFile, setImageFile] = useState(null);
   const [images, setImages] = useState([]);
