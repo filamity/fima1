@@ -49,7 +49,7 @@ const Task = () => {
     description: "",
     dueAt: "",
   });
-  tableData = filterTableData(filter, tableData);
+  let filteredTableData = filterTableData(filter, tableData);
 
   const fetchTask = (id, cb) => {
     if (isTeacher === true) {
@@ -351,7 +351,7 @@ const Task = () => {
                 />
               </div>
               <section className="buffer-15"></section>
-              {tableData.length ? (
+              {filteredTableData.length ? (
                 <Table sx={{ width: "100%" }} size="small">
                   <TableHead>
                     <TableRow>
@@ -363,7 +363,7 @@ const Task = () => {
                   </TableHead>
                   <TableBody>
                     {task.completeStatus.map((student) => {
-                      let studentData = tableData.find(
+                      let studentData = filteredTableData.find(
                         (user) => user.id === student.student
                       );
                       if (!studentData) return null;
