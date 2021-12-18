@@ -1,5 +1,6 @@
 .card {
   padding: 20px;
+  overflow-x: auto;
 }
 
 .textbody {
@@ -32,4 +33,8 @@
 .filterinput {
   padding: 0 16px;
   font-size: 0.5rem;
+}
+
+.userdata {
+  white-space: nowrap;
 }

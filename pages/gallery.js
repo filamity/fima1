@@ -5,6 +5,7 @@ import {
   IconButton,
   Typography,
   CircularProgress,
+  Avatar,
 } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -21,6 +22,7 @@ const Gallery = () => {
   const { currentUser } = useAuth();
   const [imageFile, setImageFile] = useState(null);
   const [images, setImages] = useState([]);
+  const [imageUserData, setImageUserData] = useState([]);
   images.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,17 +42,47 @@ const Gallery = () => {
     }
   }, [currentUser]);
 
-  const fetchImages = (cb) => {
-    axios
-      .get("/api/upload")
-      .then(({ data: { data } }) => {
-        setImages(data);
-        cb();
-      })
-      .catch((err) => {
-        setError(err.message);
+  const fetchImages = async (cb) => {
+    await axios.get("/api/upload").then(({ data: { data } }) => {
+      let imageData = [];
+      data.forEach((image) => {
+        imageData.push({
+          user: image.user,
+          url: image.url,
+          uploadedAt: image.uploadedAt,
+          id: image._id,
+        });
       });
+      setImages(imageData);
+      cb();
+    });
   };
+
+  useEffect(() => {
+    if (!images.length) return;
+    const userIds = images.map((image) => image.user);
+    const arr = [];
+    userIds.forEach((userId) => {
+      axios.get(`/api/user/${userId}`).then(
+        ({
+          data: {
+            data: { firstName, lastName, username, avatar, _id },
+          },
+        }) => {
+          arr.push({
+            firstName,
+            lastName,
+            username,
+            avatar,
+            _id,
+          });
+          if (arr.length === userIds.length) {
+            setImageUserData(arr);
+          }
+        }
+      );
+    });
+  }, [images]);
 
   const deleteImage = (id) => {
     setLoading(true);
@@ -70,9 +102,6 @@ const Gallery = () => {
     await handleUpload(
       imageFile,
       currentUser._id,
-      currentUser.firstName,
-      currentUser.lastName,
-      currentUser.username,
       setError,
       setProgress,
       () => {
@@ -125,40 +154,53 @@ const Gallery = () => {
       )}
       <div className={styles.gallery}>
         {!loading &&
-          images.map((image) => (
-            <Card key={image._id}>
-              <CardMedia
-                component="img"
-                height={300}
-                image={image.url}
-                title={`${image.firstName} ${image.lastName}`}
-                alt={`${image.firstName} ${image.lastName}`}
-              />
-              <CardActions>
-                <div>
-                  <Typography>
-                    {image.firstName} {image.lastName}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {formatDate(image.uploadedAt)}
-                  </Typography>
-                </div>
-                <div style={{ marginLeft: "auto" }}>
-                  {currentUser
-                    ? (currentUser.role === "admin" ||
-                        currentUser.role === "teacher") && (
-                        <IconButton onClick={() => deleteImage(image._id)}>
-                          <Delete />
-                        </IconButton>
-                      )
-                    : null}
-                  <IconButton onClick={() => window.open(image.url, "_blank")}>
-                    <OpenInNew />
-                  </IconButton>
-                </div>
-              </CardActions>
-            </Card>
-          ))}
+          imageUserData.length === images.length &&
+          images.map((image) => {
+            const { firstName, lastName, username, avatar } =
+              imageUserData.find((user) => user._id === image.user);
+            return (
+              <Card key={image.url}>
+                <CardMedia
+                  component="img"
+                  height={300}
+                  image={image.url}
+                  title={image.url}
+                  alt={image.url}
+                />
+                <CardActions>
+                  <div className={styles.imagedata}>
+                    <Avatar
+                      src={avatar || "/static/images/defaultavatar.png"}
+                    />
+                    <span className="inlinebuffer-10"></span>
+                    <div>
+                      <Typography className={styles.imagedataname}>
+                        {firstName} {lastName}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {formatDate(image.uploadedAt)}
+                      </Typography>
+                    </div>
+                  </div>
+                  <div style={{ marginLeft: "auto" }}>
+                    {currentUser
+                      ? (currentUser.role === "admin" ||
+                          currentUser.role === "teacher") && (
+                          <IconButton onClick={() => deleteImage(image.id)}>
+                            <Delete />
+                          </IconButton>
+                        )
+                      : null}
+                    <IconButton
+                      onClick={() => window.open(image.url, "_blank")}
+                    >
+                      <OpenInNew />
+                    </IconButton>
+                  </div>
+                </CardActions>
+              </Card>
+            );
+          })}
       </div>
     </div>
   );

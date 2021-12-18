@@ -37,7 +37,14 @@ const AuthProvider = ({ children }) => {
     setCurrentUser(null);
   };
 
-  const register = async (firstName, lastName, username, password, role) => {
+  const register = async (
+    firstName,
+    lastName,
+    username,
+    password,
+    role,
+    avatar
+  ) => {
     try {
       const {
         data: { data: token },
@@ -47,6 +54,7 @@ const AuthProvider = ({ children }) => {
         username,
         password,
         role,
+        avatar: avatar || null,
       });
       localStorage.setItem("token", token);
       const { userId } = jwt.verify(token, process.env.JWT_SECRET);
@@ -62,6 +70,13 @@ const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshUser = async () => {
+    const {
+      data: { data: userData },
+    } = await axios.get(`/api/user/${currentUser._id}`);
+    setCurrentUser(userData);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -73,7 +88,9 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout, register }}>
+    <AuthContext.Provider
+      value={{ refreshUser, currentUser, login, logout, register }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,16 +1,7 @@
 import { firestorage } from "../../utils/firebase";
 import axios from "axios";
 
-const handleUpload = async (
-  file,
-  user,
-  firstName,
-  lastName,
-  username,
-  setError,
-  setProgress,
-  cb
-) => {
+const handleUpload = async (file, user, setError, setProgress, cb) => {
   if (!file) return;
   const storageRef = firestorage.ref(`uploads/${file.name}`);
 
@@ -31,9 +22,6 @@ const handleUpload = async (
           .post("/api/upload", {
             url,
             user,
-            firstName,
-            lastName,
-            username,
           })
           .then(() => {
             cb();

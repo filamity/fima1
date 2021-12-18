@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new mongoose.Schema(
   {
+    avatar: { type: String, default: "/static/images/defaultavatar.png" },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     username: { type: String, required: true, unique: true },

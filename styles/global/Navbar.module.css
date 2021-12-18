@@ -23,3 +23,32 @@
   color: #fff;
   font-weight: bold;
 }
+
+.defaultinput {
+  display: none;
+}
+
+.avatarupload {
+  border-radius: 50%;
+  position: relative;
+  margin: auto;
+  opacity: 1;
+  cursor: pointer;
+}
+.avatarupload:hover {
+  opacity: 0.5;
+}
+
+.avatarprompt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9rem;
+  line-height: 1;
+  text-align: center;
+}
+
+.error {
+  padding: 6px 16px;
+}

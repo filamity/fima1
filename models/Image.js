@@ -11,18 +11,6 @@ const ImageSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  firstName: {
-    type: String,
-    required: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-  },
-  username: {
-    type: String,
-    required: true,
-  },
   uploadedAt: {
     type: Date,
     default: Date.now,
