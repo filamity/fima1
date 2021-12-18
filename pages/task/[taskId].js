@@ -371,11 +371,11 @@ const Task = () => {
                       let { firstName, lastName, username } = studentData;
                       return (
                         <TableRow key={student._id}>
-                          <TableCell className={styles.tabletext}>
+                          <TableCell sx={{ fontSize: "1rem" }}>
                             {firstName} {lastName}
                             <Typography
                               color="text.secondary"
-                              className={styles.tableusername}
+                              sx={{ fontSize: "0.8rem" }}
                             >
                               {username}
                             </Typography>
