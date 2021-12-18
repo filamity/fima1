@@ -28,6 +28,7 @@ const Login = () => {
   const [role, setRole] = useState("student");
   const [file, setFile] = useState(null);
   const [avatarLoading, setAvatarLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const types = ["image/png", "image/jpeg"];
 
   useEffect(() => {
@@ -36,14 +37,17 @@ const Login = () => {
   }, [firstName, lastName, username, password]);
 
   const handleLogin = (e) => {
+    setLoading(true);
     e.preventDefault();
     let response = login(username, password);
-    response.then((err) => {
-      setError(err.message);
+    response.then((res) => {
+      setError(res.message);
+      setLoading(false);
     });
   };
 
   const handleRegister = (e) => {
+    setLoading(true);
     e.preventDefault();
     let response = register(
       firstName,
@@ -53,8 +57,9 @@ const Login = () => {
       role,
       file
     );
-    response.then((err) => {
-      setError(err.message);
+    response.then((res) => {
+      setError(res.message);
+      setLoading(false);
     });
   };
 
@@ -120,7 +125,7 @@ const Login = () => {
                     />
                     <Avatar
                       className={styles.avatar}
-                      src={file || null}
+                      src={file || "/static/images/defaultavatar.png"}
                       sx={{ width: 60, height: 60 }}
                     />
                     {!file && (
@@ -184,7 +189,15 @@ const Login = () => {
               <section className="buffer-20"></section>
             )}
             <Button variant="contained" color="primary" type="submit">
-              {hasAccount ? "Login" : "Register"}
+              {loading ? (
+                <div className="loadingbutton">
+                  <CircularProgress color="inherit" size={20} />
+                </div>
+              ) : hasAccount ? (
+                "Login"
+              ) : (
+                "Register"
+              )}
             </Button>
           </FormGroup>
           <section className="buffer-10"></section>

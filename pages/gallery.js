@@ -66,6 +66,7 @@ const Gallery = () => {
       axios.get(`/api/user/${userId}`).then(
         ({
           data: {
+            // this line breaks if a user was deleted
             data: { firstName, lastName, username, avatar, _id },
           },
         }) => {
@@ -153,54 +154,54 @@ const Gallery = () => {
         </div>
       )}
       <div className={styles.gallery}>
-        {!loading &&
-          imageUserData.length === images.length &&
-          images.map((image) => {
-            const { firstName, lastName, username, avatar } =
-              imageUserData.find((user) => user._id === image.user);
-            return (
-              <Card key={image.url}>
-                <CardMedia
-                  component="img"
-                  height={300}
-                  image={image.url}
-                  title={image.url}
-                  alt={image.url}
-                />
-                <CardActions>
-                  <div className={styles.imagedata}>
-                    <Avatar
-                      src={avatar || "/static/images/defaultavatar.png"}
-                    />
-                    <span className="inlinebuffer-10"></span>
-                    <div>
-                      <Typography className={styles.imagedataname}>
-                        {firstName} {lastName}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {formatDate(image.uploadedAt)}
-                      </Typography>
+        {!loading && imageUserData.length === images.length
+          ? images.map((image) => {
+              const { firstName, lastName, username, avatar } =
+                imageUserData.find((user) => user._id === image.user);
+              return (
+                <Card key={image.url}>
+                  <CardMedia
+                    component="img"
+                    height={300}
+                    image={image.url}
+                    title={image.url}
+                    alt={image.url}
+                  />
+                  <CardActions>
+                    <div className={styles.imagedata}>
+                      <Avatar
+                        src={avatar || "/static/images/defaultavatar.png"}
+                      />
+                      <span className="inlinebuffer-10"></span>
+                      <div>
+                        <Typography className={styles.imagedataname}>
+                          {firstName} {lastName}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatDate(image.uploadedAt)}
+                        </Typography>
+                      </div>
                     </div>
-                  </div>
-                  <div style={{ marginLeft: "auto" }}>
-                    {currentUser
-                      ? (currentUser.role === "admin" ||
-                          currentUser.role === "teacher") && (
-                          <IconButton onClick={() => deleteImage(image.id)}>
-                            <Delete />
-                          </IconButton>
-                        )
-                      : null}
-                    <IconButton
-                      onClick={() => window.open(image.url, "_blank")}
-                    >
-                      <OpenInNew />
-                    </IconButton>
-                  </div>
-                </CardActions>
-              </Card>
-            );
-          })}
+                    <div style={{ marginLeft: "auto" }}>
+                      {currentUser
+                        ? (currentUser.role === "admin" ||
+                            currentUser.role === "teacher") && (
+                            <IconButton onClick={() => deleteImage(image.id)}>
+                              <Delete />
+                            </IconButton>
+                          )
+                        : null}
+                      <IconButton
+                        onClick={() => window.open(image.url, "_blank")}
+                      >
+                        <OpenInNew />
+                      </IconButton>
+                    </div>
+                  </CardActions>
+                </Card>
+              );
+            })
+          : null}
       </div>
     </div>
   );

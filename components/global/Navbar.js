@@ -117,7 +117,7 @@ const Navbar = () => {
           </IconButton>
           <span className="inlinebuffer-10"></span>
           <Typography variant="h6" component="div" className={styles.link}>
-            <Link href="/">FI-MA1 (v1.2)</Link>
+            <Link href="/">FI-MA1 (v1.5)</Link>
           </Typography>
           <div className={styles.accountbutton}>
             <Link href="/static/privacy/Privacy Notice FIMA1.pdf" passHref>

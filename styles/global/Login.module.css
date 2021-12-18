@@ -27,6 +27,6 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 0.9rem;
-  line-height: 1.0;
+  line-height: 1;
   text-align: center;
 }

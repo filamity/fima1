@@ -8,6 +8,7 @@ export const useAuth = () => useContext(AuthContext);
 
 const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const login = async (username, password) => {
     try {
@@ -83,13 +84,14 @@ const AuthProvider = ({ children }) => {
       const { userId } = jwt.verify(token, process.env.JWT_SECRET);
       axios.get(`/api/user/${userId}`).then((res) => {
         setCurrentUser(res.data.data);
+        setLoading(false);
       });
     }
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ refreshUser, currentUser, login, logout, register }}
+      value={{ loading, refreshUser, currentUser, login, logout, register }}
     >
       {children}
     </AuthContext.Provider>
