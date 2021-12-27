@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import styles from "../../styles/index/Notes.module.css";
 import Box from "../global/Box";
+import Markdown from "../global/MathMark";
 
 const Notes = () => {
   const { currentUser } = useAuth();
@@ -235,7 +236,7 @@ const Notes = () => {
                     <Typography variant="h5" component="div">
                       {note.title}
                     </Typography>
-                    <Typography variant="body2">{note.description}</Typography>
+                    <Markdown>{note.description}</Markdown>
                   </CardContent>
                   <section style={{ height: "56px" }}></section>
                   <div

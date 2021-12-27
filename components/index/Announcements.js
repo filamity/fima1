@@ -22,6 +22,8 @@ import axios from "axios";
 import { Add, Delete, ExpandMore, DoDisturb } from "@mui/icons-material";
 import { useAuth } from "../../contexts/AuthContext";
 
+import Markdown from "../global/MathMark";
+
 const Announcements = () => {
   const { currentUser } = useAuth();
   const [announcements, setAnnouncements] = useState([]);
@@ -226,7 +228,7 @@ const Announcements = () => {
                   ) : null}
                 </AccordionSummary>
                 <AccordionDetails sx={{ opacity: selecting ? 0.3 : 1 }}>
-                  <Typography>{announcement.description}</Typography>
+                  <Markdown>{announcement.description}</Markdown>
                 </AccordionDetails>
               </Accordion>
             ))
