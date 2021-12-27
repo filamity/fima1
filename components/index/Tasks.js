@@ -190,7 +190,13 @@ const Tasks = () => {
                 <section className="buffer-20"></section>
               )}
               <Button variant="contained" color="primary" type="submit">
-                Create
+                {loading ? (
+                  <div className="loadingbutton">
+                    <CircularProgress color="inherit" size={20} />
+                  </div>
+                ) : (
+                  "Create"
+                )}
               </Button>
             </FormGroup>
           </form>

@@ -4,14 +4,14 @@ import { useAuth } from "../contexts/AuthContext";
 
 const withAuth = (WrappedComponent) => {
   const C = (props) => {
-    const { currentUser } = useAuth();
+    const { loading, currentUser } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-      if (!currentUser) {
+      if (!loading && !currentUser) {
         router.replace("/");
       }
-    }, [router, currentUser]);
+    }, [loading, router, currentUser]);
 
     if (currentUser) {
       return <WrappedComponent {...props} />;

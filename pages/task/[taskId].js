@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "../../styles/task/Task.module.css";
 import {
+  Avatar,
   Button,
   Card,
   CircularProgress,
@@ -186,6 +187,7 @@ const Task = () => {
               firstName: student.firstName,
               lastName: student.lastName,
               username: student.username,
+              avatar: student.avatar,
             });
           });
           setTableData(formattedData);
@@ -245,7 +247,13 @@ const Task = () => {
                 <section className="buffer-20"></section>
               )}
               <Button variant="contained" color="primary" type="submit">
-                Update
+                {loading ? (
+                  <div className="loadingbutton">
+                    <CircularProgress color="inherit" size={20} />
+                  </div>
+                ) : (
+                  "Update"
+                )}
               </Button>
             </FormGroup>
           </form>
@@ -368,17 +376,26 @@ const Task = () => {
                         (user) => user.id === student.student
                       );
                       if (!studentData) return null;
-                      let { firstName, lastName, username } = studentData;
+                      let { firstName, lastName, username, avatar } =
+                        studentData;
                       return (
                         <TableRow key={student._id}>
-                          <TableCell className={styles.tabletext}>
-                            {firstName} {lastName}
-                            <Typography
-                              color="text.secondary"
-                              className={styles.tableusername}
-                            >
-                              {username}
-                            </Typography>
+                          <TableCell sx={{ fontSize: "1rem", display: "flex" }}>
+                            <Avatar
+                              className={styles.avatar}
+                              src={avatar || "/static/images/defaultavatar.png"}
+                              sx={{ width: 45, height: 45 }}
+                            />
+                            <span className="inlinebuffer-15"></span>
+                            <div className={styles.userdata}>
+                              {firstName} {lastName}
+                              <Typography
+                                color="text.secondary"
+                                sx={{ fontSize: "0.8rem" }}
+                              >
+                                {username}
+                              </Typography>
+                            </div>
                           </TableCell>
                           <TableCell align="right">
                             {student.completed ? (

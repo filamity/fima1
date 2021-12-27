@@ -29,6 +29,7 @@
     "react-katex": "^2.0.2",
     "react-markdown": "^7.1.1",
     "remark-math": "^5.1.1"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "eslint": "8.4.1",

@@ -1,5 +1,6 @@
 .card {
   padding: 20px;
+  overflow-x: auto;
 }
 
 .textbody {
@@ -34,10 +35,6 @@
   font-size: 0.5rem;
 }
 
-.tabletext {
-  font-size: 1rem;
-}
-
-.tableusername {
-  font-size: 0.85rem;
+.userdata {
+  white-space: nowrap;
 }

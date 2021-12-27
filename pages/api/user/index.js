@@ -29,9 +29,11 @@ export default async function (req, res) {
     // Returns JWT token
     case "POST":
       try {
-        const { firstName, lastName, username, password, role } = req.body;
+        const { firstName, lastName, username, password, role, avatar } =
+          req.body;
         const encryptedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({
+          avatar: avatar || null,
           firstName,
           lastName,
           username,
