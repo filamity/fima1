@@ -1,3 +1,5 @@
+/* completely plagiarised from https://levelup.gitconnected.com/adding-katex-and-markdown-in-react-7b70694004ef */
+
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import RemarkMathPlugin from 'remark-math';
